@@ -64,7 +64,8 @@ pub async fn socket_create_and_connect(target: &Target) -> Result<(SocketAddr, T
         }
     };
 
-    match tokio::time::timeout(Duration::from_secs(20), socket.connect(addr)).await {
+    let connect = socket.connect(addr);
+    match tokio::time::timeout(Duration::from_secs(2), connect).await {
         Ok(Ok(e)) => {
             Ok((addr, e))
         },
@@ -72,7 +73,9 @@ pub async fn socket_create_and_connect(target: &Target) -> Result<(SocketAddr, T
             Err(anyhow!("Could not connect to {addr}"))
         }
         Err(_) => {
-            Err(anyhow!("Timed out connecting to {addr}"))
+            let err = format!("Timed out connecting to {addr}");
+            log::debug!("{}", err);
+            Err(anyhow!(err))
         }
     }
 }

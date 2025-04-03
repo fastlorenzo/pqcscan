@@ -432,6 +432,7 @@ pub async fn tls_scan_target(config: &Arc<Config>, target: &Target) -> ScanResul
         }
         let (addr, stream) = ret.unwrap();
         let mut stream = stream.into_std().unwrap();
+        stream.set_nonblocking(false).unwrap();
 
         let ret = tls_connect_with_group(&mut stream, &target.host, group);
         match ret {
