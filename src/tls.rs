@@ -419,7 +419,7 @@ pub async fn tls_scan_target(config: &Arc<Config>, target: &Target) -> ScanResul
 
     for group in groups {
 
-        let ret = socket_create_and_connect(&target).await;
+        let ret = socket_create_and_connect(&target, config.connection_timeout).await;
         if ret.is_err() {
             log::trace!("Could not connect to {target}");
             return ScanResult::Tls {

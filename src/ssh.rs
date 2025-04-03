@@ -186,7 +186,7 @@ async fn ssh_echoback_idstring(stream: &TcpStream) {
 pub async fn ssh_scan_target(config: &Arc<Config>, target: &Target) -> ScanResult {
     log::debug!("Started SSH scanning {}", target);
 
-    let ret = socket_create_and_connect(&target).await;
+    let ret = socket_create_and_connect(&target, config.connection_timeout).await;
     if ret.is_err() {
         log::trace!("Could not connect to {target}");
         return ScanResult::Ssh {

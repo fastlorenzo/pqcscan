@@ -39,7 +39,7 @@ pub fn parse_single_target(input: &String) -> Result<Target> {
     }
 }
 
-pub async fn socket_create_and_connect(target: &Target) -> Result<(SocketAddr, TcpStream)> {
+pub async fn socket_create_and_connect(target: &Target, timeout: u64) -> Result<(SocketAddr, TcpStream)> {
 
     let addrs_resolved = format!("{0}:{1}", target.host, target.port).to_socket_addrs();
     if addrs_resolved.is_err() {
@@ -65,7 +65,7 @@ pub async fn socket_create_and_connect(target: &Target) -> Result<(SocketAddr, T
     };
 
     let connect = socket.connect(addr);
-    match tokio::time::timeout(Duration::from_secs(2), connect).await {
+    match tokio::time::timeout(Duration::from_secs(timeout), connect).await {
         Ok(Ok(e)) => {
             Ok((addr, e))
         },
@@ -73,7 +73,7 @@ pub async fn socket_create_and_connect(target: &Target) -> Result<(SocketAddr, T
             Err(anyhow!("Could not connect to {addr}"))
         }
         Err(_) => {
-            let err = format!("Timed out connecting to {addr}");
+            let err = format!("Timed out after {timeout}s connecting to {addr}");
             log::debug!("{}", err);
             Err(anyhow!(err))
         }
