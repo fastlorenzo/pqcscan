@@ -12,11 +12,13 @@ use tera::{Tera, Context};
 mod config;
 mod utils;
 mod ssh;
-mod result;
+mod tls;
+mod tlsconstants;
+mod scan;
 
-use crate::utils::{ScanOptions, Target, parse_single_target};
+use crate::utils::{Target, parse_single_target};
 use crate::config::Config;
-use crate::ssh::ssh_scan;
+use crate::scan::{ScanType, ScanOptions, scan_runner};
 
 #[derive(RustEmbed)]
 #[folder = "$CARGO_MANIFEST_DIR/support"]
@@ -119,7 +121,6 @@ fn main() -> Result<()> {
                 .disable_help_flag(true)
                 .disable_version_flag(true)
         )
-        /*
         .subcommand(
             Command::new("tls-scan")
                 .about("Scan TLS servers")
@@ -130,7 +131,7 @@ fn main() -> Result<()> {
                 .disable_help_flag(true)
                 .disable_version_flag(true)
         )
-        */
+        /*
         .subcommand(
             Command::new("report")
                 .about("Convert JSON output to HTML report")
@@ -139,41 +140,52 @@ fn main() -> Result<()> {
                 .disable_help_flag(true)
                 .disable_version_flag(true)
         )
+        */
         .get_matches();
 
     let config = Config::new();
 
     let mut scan = ScanOptions {
         num_threads: 2,
-        targets: vec![]
+        targets: vec![],
+        scan_type: None
     };
 
     match matches.subcommand() {
         Some(("tls-scan", sub_matches)) => {
-            let _ = get_targets(sub_matches)?;
-            return Err(anyhow!("not implemented yet"));
+            scan.targets = get_targets(sub_matches)?;
+            scan.scan_type = Some(ScanType::Tls);        
         },
         Some(("ssh-scan", sub_matches)) => {
-            let targets = get_targets(sub_matches)?;
-            scan.targets = targets;
-            let rt = Runtime::new()?;
-            let results = rt.block_on(ssh_scan(Arc::new(config), scan));
-
-            let mut writer = BufWriter::new(std::io::stdout());
-            serde_json::to_writer(&mut writer, &results)?;
-
-            let mut tera = Tera::default();
-            let html_file = EmbeddedResources::get("template.html").unwrap();
-            let html_data = std::str::from_utf8(html_file.data.as_ref())?;
-            tera.add_raw_template("template.html", html_data)?;
-            let mut ctx = Context::from_serialize(&results)?;
-            ctx.insert("title", "wut");
-
-            println!("{}", tera.render("template.html", &ctx)?);
+            scan.targets = get_targets(sub_matches)?;
+            scan.scan_type = Some(ScanType::Ssh);
         },
         Some(("report", sub_matches)) => {
         }
         _ => unreachable!("somehow reached this")
+    }
+
+    /* perform scan if requested */
+    if scan.scan_type.is_some() {
+        let rt = Runtime::new()?;
+        let results = rt.block_on(scan_runner(Arc::new(config), scan));
+
+        
+        
+        let mut writer = BufWriter::new(std::io::stdout());
+        serde_json::to_writer(&mut writer, &results)?;
+
+        /*
+        let mut tera = Tera::default();
+        let html_file = EmbeddedResources::get("template.html").unwrap();
+        let html_data = std::str::from_utf8(html_file.data.as_ref())?;
+        tera.add_raw_template("template.html", html_data)?;
+        let mut ctx = Context::from_serialize(&results)?;
+        ctx.insert("title", "wut");
+
+        println!("{}", tera.render("template.html", &ctx)?);
+
+        */
     }
 
     Ok(())

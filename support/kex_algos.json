@@ -1,0 +1,478 @@
+{
+  "bike-l1-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "bike-l3-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "bike-l5-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "classic-mceliece-348864-sha256": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "classic-mceliece-348864f-sha256": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "classic-mceliece-460896-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "classic-mceliece-460896f-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "classic-mceliece-6688128-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "classic-mceliece-6688128f-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "classic-mceliece-6960119-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "classic-mceliece-6960119f-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "classic-mceliece-8192128-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "classic-mceliece-8192128f-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "curve25519-sha256": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "curve25519-sha256@libssh.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "diffie-hellman-group-exchange-sha256": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "diffie-hellman-group14-sha256": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "diffie-hellman-group16-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "diffie-hellman-group18-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp256-bike-l1r4-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp256-classic-mceliece-348864fr4-sha256@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp256-classic-mceliece-348864r4-sha256@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp256-frodokem-640-aesr2-sha256@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp256-frodokem-640-shaker2-sha256@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp256-hqc-128r3-sha256@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp256-kyber-512r3-sha256-d00@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp256-ml-kem-512-sha256@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp384-bike-l3r4-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp384-classic-mceliece-460896fr4-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp384-classic-mceliece-460896r4-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp384-frodokem-976-aesr2-sha384@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp384-frodokem-976-shaker2-sha384@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp384-hqc-192r3-sha384@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp384-kyber-768r3-sha384-d00@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp521-bike-l5r4-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp521-classic-mceliece-6688128fr4-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp521-classic-mceliece-6688128r4-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp521-classic-mceliece-6960119fr4-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp521-classic-mceliece-6960119r4-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp521-classic-mceliece-8192128fr4-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp521-classic-mceliece-8192128r4-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp521-frodokem-1344-aesr2-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp521-frodokem-1344-shaker2-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp521-hqc-256r3-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-nistp521-kyber-1024r3-sha512-d00@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-sha2-nistp256": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-sha2-nistp384": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ecdh-sha2-nistp521": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ext-info-s": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "frodokem-1344-aes-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "frodokem-1344-shake-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "frodokem-640-aes-sha256": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "frodokem-640-shake-sha256": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "frodokem-976-aes-sha384": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "frodokem-976-shake-sha384": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "hqc-128-sha256": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "hqc-192-sha384": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "hqc-256-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "kex-strict-s-v00@openssh.com": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "kyber-1024-sha512": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "kyber-512-sha256": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "kyber-768-sha384": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ml-kem-1024-sha384": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ml-kem-512-sha256": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "ml-kem-768-sha256": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "mlkem1024nistp384-sha384": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "mlkem768nistp256-sha256": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "mlkem768x25519-sha256": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "sntrup761-sha512": {
+    "pqc": true,
+    "broken": false,
+    "desc": "Streamlined NTRU Prime sntrup761 with SHA-512",
+    "href": "le.com"
+  },
+  "sntrup761x25519-sha512": {
+    "pqc": true,
+    "hybrid": true,
+    "broken": false,
+    "desc": "Hybrid Streamlined NTRU Prime sntrup761 and X25519 with SHA-512",
+    "href": "https://www.ietf.org/archive/id/draft-josefsson-ntruprime-hybrid-00.txt" 
+  },
+  "sntrup761x25519-sha512@openssh.com": {
+    "pqc": true,
+    "hybrid": true,
+    "broken": false,
+    "desc": "Hybrid Streamlined NTRU Prime sntrup761 and X25519 with SHA-512",
+    "href": "https://www.ietf.org/archive/id/draft-josefsson-ntruprime-hybrid-00.txt"
+  },
+  "x25519-bike-l1r4-sha512@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "x25519-classic-mceliece-348864fr4-sha256@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "x25519-classic-mceliece-348864r4-sha256@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "x25519-frodokem-640-aesr2-sha256@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "x25519-frodokem-640-shaker2-sha256@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "x25519-hqc-128r3-sha256@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "x25519-kyber-512r3-sha256-d00@amazon.com": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  },
+  "x25519-ml-kem-512-sha256@openquantumsafe.org": {
+    "pqc": false,
+    "broken": false,
+    "desc": null,
+    "href": null
+  }
+}

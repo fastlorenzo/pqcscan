@@ -1,9 +1,9 @@
 #![allow(unused)]
 
 use anyhow::{anyhow, Result};
-use crate::utils::{ScanOptions, Target};
+use crate::utils::Target;
 use crate::Config;
-use crate::result::{Scan, ScanResult};
+use crate::scan::{Scan, ScanResult};
 use std::io::{ErrorKind, Seek, SeekFrom};
 use tokio::net::{TcpSocket, TcpStream};
 use std::net::ToSocketAddrs;
@@ -15,6 +15,7 @@ use serde::Deserialize;
 use std::sync::Arc;
 use chrono::prelude::*;
 
+use crate::utils::socket_create_and_connect;
 
 #[derive(RustEmbed)]
 #[folder = "$CARGO_MANIFEST_DIR/support"]
@@ -182,54 +183,23 @@ async fn ssh_echoback_idstring(stream: &TcpStream) {
     }
 }
 
-async fn ssh_scan_target(config: &Arc<Config>, target: &Target) -> ScanResult {
-    log::debug!("Started scanning {}", target);
+pub async fn ssh_scan_target(config: &Arc<Config>, target: &Target) -> ScanResult {
+    log::debug!("Started SSH scanning {}", target);
 
-    let addrs_resolved = format!("{0}:{1}", target.host, target.port).to_socket_addrs();
-    if addrs_resolved.is_err() {
-        log::trace!("Could not resolve {target}: {:?}", addrs_resolved.err());
+    let ret = socket_create_and_connect(&target).await;
+    if ret.is_err() {
+        log::trace!("Could not connect to {target}");
         return ScanResult::Ssh {
             targetspec: target.clone(),
             addr: None,
-            error: Some(format!("Could not resolve {}", target.host)),
+            error: Some(ret.unwrap_err().to_string()),
             pqc_supported: false,
             pqc_algos: None,
             nonpqc_algos: None,
         };
     }
-    let addr = addrs_resolved.unwrap().next();
-    if addr.is_none() {
-        log::trace!("Could not resolve {target}. No addresses returned");
-        return ScanResult::Ssh {
-            targetspec: target.clone(),
-            addr: None,
-            error: Some(format!("Could not resolve {}", target.host)),
-            pqc_supported: false,
-            pqc_algos: None,
-            nonpqc_algos: None,
-        };
-    }
-
-    let addr = addr.unwrap();
-    log::trace!("Resolved {0} to {1}", target, addr);
-
-    let socket = TcpSocket::new_v4().unwrap();
-    let connect_result = socket.connect(addr).await;
-    if connect_result.is_err() {
-        log::trace!("Could not connect to {addr}");
-        return ScanResult::Ssh {
-            targetspec: target.clone(),
-            addr: Some(addr.to_string()),
-            error: Some(format!("Could not connect to {addr}")),
-            pqc_supported: false,
-            pqc_algos: None,
-            nonpqc_algos: None,
-        };
-    }
-
-    log::trace!("Connected to {addr}");
-    let stream = connect_result.unwrap();
-    
+    let (addr, stream) = ret.unwrap();
+        
     ssh_echoback_idstring(&stream).await;
 
     let mut pqc_supported = false;
@@ -251,12 +221,12 @@ async fn ssh_scan_target(config: &Arc<Config>, target: &Target) -> ScanResult {
                     },
                     Some(a) => {
                         if a.pqc {
-                            log::warn!("PQC Algorithm supported: {}", k);
+                            log::debug!("PQC Algorithm supported: {}", k);
                             pqc_supported = true;
                             pqc_algos.push(k);
                         }
                         else {
-                            log::trace!("Non-PQC Algorithm supported: {}", k);
+                            log::debug!("Non-PQC Algorithm supported: {}", k);
                             nonpqc_algos.push(k);
                         }
                     }
@@ -275,89 +245,4 @@ async fn ssh_scan_target(config: &Arc<Config>, target: &Target) -> ScanResult {
         nonpqc_algos: Some(nonpqc_algos)
     };
     return ret;
-}
-
-pub async fn ssh_scan(config: Arc<Config>, scan: ScanOptions) -> Scan {
-
-    let (tx, rx_orig) = async_channel::unbounded();
-    let (results_tx_orig, results_rx) = async_channel::unbounded();
-    let targets_cnt = scan.targets.len();
-
-    /* no need to have more threads than targets */
-    let mut num_threads = scan.num_threads;
-    if num_threads > targets_cnt {
-        num_threads = targets_cnt;
-    }
-
-    let start_time = Utc::now();
-
-    /* send all targets into the channel and end with
-     * empty targets as a signal for the tasks to exit
-     * cleanly. */
-    for target in scan.targets {
-        log::trace!("Sending {}", target);
-        if let Err(_) = tx.send(target).await {
-            log::error!("thread dropped");
-        }
-    }
-    for _ in 0..num_threads {
-        if let Err(_) = tx.send(Target { host: "".to_string(), port: 0 }).await {
-            log::error!("Thread dropped");
-        }
-    }
-
-    log::trace!("Spawning {} Thread", num_threads);
-    for no in 1..num_threads+1 {
-
-        log::trace!("Spawning SSH Scan Thread {}", no);
-
-        let rx = rx_orig.clone();
-        let results_tx = results_tx_orig.clone();
-        let config = config.clone();
-        tokio::spawn(async move {
-            loop {
-                while let Ok(target) = rx.recv().await {
-
-                    /* empty host for a Target means we are asked to quit */
-                    if target.host.len() == 0 {
-                        log::trace!("Exit requested for SSH Scan Thread {}", no);
-                        let _ = results_tx.send(ScanResult::Done).await;
-                        break;
-                    }
-
-                    let result = ssh_scan_target(&config, &target).await;
-                    let _ = results_tx.send(result).await;
-                }
-
-                log::trace!("Exiting SSH Scan Thread {}", no);
-                break;
-            }
-        });
-    }
-
-    let mut results: Vec<ScanResult> = vec![];
-
-    while let Ok(result) = results_rx.recv().await {
-        match result {
-            ScanResult::Done => {
-                num_threads -= 1;
-                if num_threads == 0 {
-                    break;
-                }
-            }
-            _ => {
-                results.push(result);
-            }
-        }
-    }
-
-    let scan = Scan {
-       results: results,
-       start_time: start_time,
-       end_time: Utc::now()
-    };
-
-    log::info!("Done scanning. All threads exited.");
-
-    return scan;
 }

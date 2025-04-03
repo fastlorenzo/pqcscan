@@ -1,11 +1,9 @@
 use anyhow::{anyhow, Result};
 use std::fmt;
 use serde::{Serialize, Deserialize};
-
-pub struct ScanOptions {
-    pub num_threads: usize,
-    pub targets: Vec<Target>
-}
+use tokio::net::{TcpSocket, TcpStream};
+use tokio::time::Duration;
+use std::net::{SocketAddr, ToSocketAddrs};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Target {
@@ -37,6 +35,44 @@ pub fn parse_single_target(input: &String) -> Result<Target> {
                     })
                 }
             }
+        }
+    }
+}
+
+pub async fn socket_create_and_connect(target: &Target) -> Result<(SocketAddr, TcpStream)> {
+
+    let addrs_resolved = format!("{0}:{1}", target.host, target.port).to_socket_addrs();
+    if addrs_resolved.is_err() {
+        log::trace!("Could not resolve {target}: {:?}", addrs_resolved.err());
+        return Err(anyhow!("Could not resolve {}", target.host));
+    }
+
+    let addr = addrs_resolved.unwrap().next();
+    if addr.is_none() {
+        return Err(anyhow!("Could not resolve {}", target.host));
+    }
+
+    let addr = addr.unwrap();
+    log::trace!("Resolved {0} to {1}", target, addr);
+
+    let socket = match addr {
+        SocketAddr::V4(_) => {
+            TcpSocket::new_v4().unwrap()
+        }
+        SocketAddr::V6(_) => {
+            TcpSocket::new_v6().unwrap()
+        }
+    };
+
+    match tokio::time::timeout(Duration::from_secs(20), socket.connect(addr)).await {
+        Ok(Ok(e)) => {
+            Ok((addr, e))
+        },
+        Ok(Err(e)) => {
+            Err(anyhow!("Could not connect to {addr}"))
+        }
+        Err(_) => {
+            Err(anyhow!("Timed out connecting to {addr}"))
         }
     }
 }
