@@ -8,30 +8,32 @@ use tokio::runtime::Runtime;
 use std::sync::Arc;
 use rust_embed::RustEmbed;
 use tera::{Tera, Context};
+use chrono::prelude::*;
 
 mod config;
 mod utils;
+mod scan;
 mod ssh;
 mod tls;
 mod tlsconstants;
-mod scan;
 
 use crate::utils::{Target, parse_single_target};
 use crate::config::Config;
-use crate::scan::{ScanType, ScanOptions, scan_runner};
+use crate::scan::{Scan, ScanType, ScanOptions, ScanResult, scan_runner};
 
 #[derive(RustEmbed)]
 #[folder = "$CARGO_MANIFEST_DIR/support"]
 #[include = "template.html"]
 struct EmbeddedResources;
 
-fn output_args() -> Vec<clap::Arg> {
+fn output_args(file_type: &str, req: bool) -> Vec<clap::Arg> {
     vec![
         Arg::new("output")
             .short('o')
             .value_name("FILE")
             .long("output")
-            .help("JSON file to output results into")
+            .help(format!("{} file to write results to", file_type))
+            .required(req)
             .action(ArgAction::Set),
     ]
 }
@@ -95,6 +97,33 @@ fn get_targets(matches: &ArgMatches, default_port: Option<u16>) -> Result<Vec<Ta
     }
 }
 
+fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
+    println!("{:?}", input_files);
+    let mut results: Vec<ScanResult> = vec![];
+    let mut start_time: DateTime<Utc>;
+    let mut end_time: DateTime<Utc>;
+
+    for input_file in input_files {
+
+        log::debug!("Opening and parsing {}", input_file);
+        let mut file = File::open(input_file)?;
+        let scan: Scan = serde_json::from_reader(file).expect("failed to open input file");
+    }
+
+
+    let mut tera = Tera::default();
+    let html_file = EmbeddedResources::get("template.html").unwrap();
+    let html_data = std::str::from_utf8(html_file.data.as_ref())?;
+    tera.add_raw_template("template.html", html_data)?;
+    let mut ctx = Context::from_serialize(&results)?;
+    //ctx.insert("title", "wut");
+
+    println!("{}", tera.render("template.html", &ctx)?);
+
+    Ok(())
+}
+
+
 fn main() -> Result<()> {
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
@@ -112,7 +141,7 @@ fn main() -> Result<()> {
                 .next_help_heading("Target")
                 .args(target_args())
                 .next_help_heading("Output")
-                .args(output_args())
+                .args(output_args("JSON", false))
                 .disable_help_flag(true)
                 .disable_version_flag(true)
         )
@@ -122,20 +151,27 @@ fn main() -> Result<()> {
                 .next_help_heading("Target")
                 .args(target_args())
                 .next_help_heading("Output")
-                .args(output_args())
+                .args(output_args("JSON", false))
                 .disable_help_flag(true)
                 .disable_version_flag(true)
         )
-        /*
         .subcommand(
-            Command::new("report")
-                .about("Convert JSON output to HTML report")
+            Command::new("create-report")
+                .about("Convert JSON results to HTML report")
                 .next_help_heading("Input")
+                .args(vec![
+                    Arg::new("input")
+                        .short('i')
+                        .long("input")
+                        .value_name("JSON file")
+                        .help("JSON file containing scan results ")
+                        .num_args(0..)
+                ])
                 .next_help_heading("Output")
+                .args(output_args("HTML", true))
                 .disable_help_flag(true)
                 .disable_version_flag(true)
         )
-        */
         .get_matches();
 
     let config = Config::new();
@@ -146,16 +182,22 @@ fn main() -> Result<()> {
         scan_type: None
     };
 
+    let mut output_json_file: Option<&String> = None;
+
     match matches.subcommand() {
         Some(("tls-scan", sub_matches)) => {
             scan.targets = get_targets(sub_matches, Some(config.tls_config.default_port))?;
-            scan.scan_type = Some(ScanType::Tls);        
+            scan.scan_type = Some(ScanType::Tls);
+            output_json_file = sub_matches.get_one::<String>("output");
         },
         Some(("ssh-scan", sub_matches)) => {
             scan.targets = get_targets(sub_matches, Some(config.ssh_config.default_port))?;
             scan.scan_type = Some(ScanType::Ssh);
+            output_json_file = sub_matches.get_one::<String>("output");
         },
-        Some(("report", sub_matches)) => {
+        Some(("create-report", sub_matches)) => {
+            let input_files: Vec<_> = sub_matches.get_many::<String>("input").unwrap().collect();
+            create_report(sub_matches.get_one::<String>("output").unwrap(), &input_files)?;
         }
         _ => unreachable!("somehow reached this")
     }
@@ -165,22 +207,12 @@ fn main() -> Result<()> {
         let rt = Runtime::new()?;
         let results = rt.block_on(scan_runner(Arc::new(config), scan));
 
-        
-        
-        let mut writer = BufWriter::new(std::io::stdout());
-        serde_json::to_writer(&mut writer, &results)?;
-
-        /*
-        let mut tera = Tera::default();
-        let html_file = EmbeddedResources::get("template.html").unwrap();
-        let html_data = std::str::from_utf8(html_file.data.as_ref())?;
-        tera.add_raw_template("template.html", html_data)?;
-        let mut ctx = Context::from_serialize(&results)?;
-        ctx.insert("title", "wut");
-
-        println!("{}", tera.render("template.html", &ctx)?);
-
-        */
+        /* write results to JSON output if requested */
+        if output_json_file.is_some() {
+            let mut f = File::create(output_json_file.unwrap())?;
+            let mut writer = BufWriter::new(f);
+            serde_json::to_writer(&mut writer, &results)?;
+        }
     }
 
     Ok(())
