@@ -1,4 +1,0 @@
-- add default port option when parsing targets
-- properly show for TLS as well as SSH if we 
-  - could connect successfully and speak the protocol
-  - or if we had connection issues/couldnt connect etc

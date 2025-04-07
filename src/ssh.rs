@@ -33,13 +33,15 @@ struct KexAlgo {
 }
 
 pub struct SshConfig {
-    kex_algos: HashMap<String, KexAlgo>
+    kex_algos: HashMap<String, KexAlgo>,
+    pub default_port: u16
 }
 
 impl SshConfig {
     pub fn new() -> SshConfig {
         SshConfig {
-            kex_algos: Self::load_kex_algos()
+            kex_algos: Self::load_kex_algos(),
+            default_port: 22
         }
     }
 

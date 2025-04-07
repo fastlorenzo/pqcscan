@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 use env_logger::Env;
-use clap::{Arg, Command, ArgAction, ArgMatches};
+use clap::{Arg, Command, ArgAction, ArgMatches, crate_version};
 use std::path::PathBuf;
 use std::io::{BufReader, BufRead, BufWriter};
 use std::fs::File;
@@ -27,11 +27,6 @@ struct EmbeddedResources;
 
 fn output_args() -> Vec<clap::Arg> {
     vec![
-        Arg::new("append")
-            .short('a')
-            .long("append")
-            .help("Append results to output JSON file")
-            .action(ArgAction::SetTrue),
         Arg::new("output")
             .short('o')
             .value_name("FILE")
@@ -61,10 +56,10 @@ fn target_args() -> Vec<clap::Arg> {
     ]
 }
 
-fn get_targets(matches: &ArgMatches) -> Result<Vec<Target>> {
+fn get_targets(matches: &ArgMatches, default_port: Option<u16>) -> Result<Vec<Target>> {
     match matches.get_one::<String>("target") {
         Some(t) => {
-            Ok(vec![parse_single_target(t)?])
+            Ok(vec![parse_single_target(t, default_port)?])
         },
         None => {
             let f = matches.get_one::<PathBuf>("target-list");
@@ -85,7 +80,7 @@ fn get_targets(matches: &ArgMatches) -> Result<Vec<Target>> {
                     continue;
                 }
 
-                match parse_single_target(&line) {
+                match parse_single_target(&line, default_port) {
                     Ok(t) => {
                         targets.push(t)
                     },
@@ -104,7 +99,7 @@ fn main() -> Result<()> {
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
     let matches = Command::new("pqcscan")
-        .version("1.0")
+        .version(crate_version!())
         .propagate_version(true)
         .subcommand_required(true)
         .arg_required_else_help(true)
@@ -146,18 +141,18 @@ fn main() -> Result<()> {
     let config = Config::new();
 
     let mut scan = ScanOptions {
-        num_threads: 2,
+        num_threads: 20,
         targets: vec![],
         scan_type: None
     };
 
     match matches.subcommand() {
         Some(("tls-scan", sub_matches)) => {
-            scan.targets = get_targets(sub_matches)?;
+            scan.targets = get_targets(sub_matches, Some(config.tls_config.default_port))?;
             scan.scan_type = Some(ScanType::Tls);        
         },
         Some(("ssh-scan", sub_matches)) => {
-            scan.targets = get_targets(sub_matches)?;
+            scan.targets = get_targets(sub_matches, Some(config.ssh_config.default_port))?;
             scan.scan_type = Some(ScanType::Ssh);
         },
         Some(("report", sub_matches)) => {

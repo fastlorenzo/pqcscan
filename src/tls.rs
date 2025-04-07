@@ -26,6 +26,18 @@ struct KeyShareEntry {
     exchange: Vec<u8>
 }
 
+pub struct TlsConfig {
+    pub default_port: u16
+}
+
+impl TlsConfig {
+    pub fn new() -> TlsConfig {
+        TlsConfig {
+            default_port: 443
+        }
+    }
+}
+
 impl KeyShareEntry {
     pub fn new(group: u16, exchange: Vec<u8>) -> KeyShareEntry {
         KeyShareEntry {
@@ -410,11 +422,13 @@ pub async fn tls_scan_target(config: &Arc<Config>, target: &Target) -> ScanResul
 
     let groups = vec![
         Group::X25519MLKEM768,
+        /*
         Group::SECP256R1MLKEM768,
         Group::SECP384R1MLKEM1024,
         Group::MLKEM1024,
         Group::MLKEM512,
         Group::MLKEM768,
+        */
     ];
 
     for group in groups {

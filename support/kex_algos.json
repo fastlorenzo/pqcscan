@@ -390,19 +390,19 @@
     "href": null
   },
   "mlkem1024nistp384-sha384": {
-    "pqc": false,
+    "pqc": true,
     "broken": false,
     "desc": null,
     "href": null
   },
   "mlkem768nistp256-sha256": {
-    "pqc": false,
+    "pqc": true,
     "broken": false,
     "desc": null,
     "href": null
   },
   "mlkem768x25519-sha256": {
-    "pqc": false,
+    "pqc": true,
     "broken": false,
     "desc": null,
     "href": null

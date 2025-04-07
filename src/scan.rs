@@ -31,7 +31,9 @@ pub enum ScanResult {
 pub struct Scan {
     pub results: Vec<ScanResult>,
     pub start_time: DateTime<Utc>,
-    pub end_time: DateTime<Utc>
+    pub end_time: DateTime<Utc>,
+    pub version: String
+    
 }
 
 #[derive(Clone, Copy)]
@@ -130,7 +132,8 @@ pub async fn scan_runner(config: Arc<Config>, scan: ScanOptions) -> Scan {
     let scan = Scan {
        results: results,
        start_time: start_time,
-       end_time: Utc::now()
+       end_time: Utc::now(),
+       version: clap::crate_version!().to_string()
     };
 
     log::info!("Done scanning. All threads exited.");

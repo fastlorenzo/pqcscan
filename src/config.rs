@@ -1,7 +1,9 @@
 use crate::ssh::SshConfig;
+use crate::tls::TlsConfig;
 
 pub struct Config {
     pub ssh_config: SshConfig,
+    pub tls_config: TlsConfig,
 
     /* connection timeout in seconds */
     pub connection_timeout: u64
@@ -11,6 +13,7 @@ impl Config {
     pub fn new() -> Config {
         let cfg = Config {
             ssh_config: SshConfig::new(),
+            tls_config: TlsConfig::new(),
             connection_timeout: 5
         };
 
