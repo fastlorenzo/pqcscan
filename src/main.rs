@@ -101,9 +101,9 @@ fn get_targets(matches: &ArgMatches, default_port: Option<u16>) -> Result<Vec<Ta
 
 #[derive(Serialize)]
 struct ReportResults {
-    tls_results: HashMap<String, ScanResult>,
+    tls_results: HashMap<String, Vec<ScanResult>>,
     tls_sorted_hosts: Vec<String>,
-    ssh_results: HashMap<String, ScanResult>,
+    ssh_results: HashMap<String, Vec<ScanResult>>,
     ssh_sorted_hosts: Vec<String>
 }
 
@@ -111,8 +111,8 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
     let mut start_time: DateTime<Utc>;
     let mut end_time: DateTime<Utc>;
 
-    let mut tls_map: HashMap<String, ScanResult> = HashMap::new();
-    let mut ssh_map: HashMap<String, ScanResult> = HashMap::new();
+    let mut tls_map: HashMap<String, Vec<ScanResult>> = HashMap::new();
+    let mut ssh_map: HashMap<String, Vec<ScanResult>> = HashMap::new();
     let mut tls_hosts: Vec<String> = Vec::new();
     let mut ssh_hosts: Vec<String> = Vec::new();
 
@@ -131,13 +131,22 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
         for result in scan.results {
             match result {
                 ScanResult::Ssh {ref targetspec, ref addr, ref error, pqc_supported, ref pqc_algos, ref nonpqc_algos} => {
-                    tls_hosts.push(targetspec.host.clone());
-                    tls_map.insert(targetspec.host.clone(), result);
-                    
+                    ssh_hosts.push(targetspec.host.clone());
+                    let host = targetspec.host.clone();
+                    if ssh_map.get(&host).is_none() {
+                        ssh_map.insert(host.clone(), Vec::new());
+                    }
+                    let m = ssh_map.get_mut(&host).unwrap();
+                    m.push(result);                    
                 },
                 ScanResult::Tls {ref targetspec, ref addr, ref error, pqc_supported, ref pqc_algos, ref hybrid_algos} => {
-                    ssh_hosts.push(targetspec.host.clone());
-                    ssh_map.insert(targetspec.host.clone(), result);
+                    tls_hosts.push(targetspec.host.clone());
+                    let host = targetspec.host.clone();
+                    if tls_map.get(&host).is_none() {
+                        tls_map.insert(host.clone(), Vec::new());
+                    }
+                    let m = tls_map.get_mut(&host).unwrap();
+                    m.push(result);
                 },
                 _ => { 
                     panic!("Unexpected result type");
@@ -146,8 +155,7 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
         }
     }
 
-
-    println!("{} TLS results, {} SSH results", tls_map.len(), ssh_map.len());
+    log::debug!("{} TLS results, {} SSH results", tls_map.len(), ssh_map.len());
 
     tls_hosts.sort();
     ssh_hosts.sort();
@@ -167,7 +175,10 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
     
     ctx.insert("title", "wut");
 
-    println!("{}", tera.render("template.html", &ctx)?);
+    log::trace!("Tera Template: {:?}", ctx);
+
+    let mut f = File::create(output_file)?;
+    tera.render_to("template.html", &ctx, f)?;
 
     Ok(())
 }

@@ -1,13 +1,122 @@
-<html>
-<head>
-<title>{{ title }}</title>
-</head>
-<body> 
-{% for hostname in tls_sorted_hosts %}
-  {% set result = tls_results[hostname] %}
-    <div>{{ result.targetspec }}</div>
-{% endfor %}
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" data-bs-theme="dark">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>PQCScan Results - {{ title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+      /* Scroll to Top Button */
+      #scrollToTopBtn {
+        display: none; /* Hidden by default */
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+  <body> 
+    <button id="scrollToTopBtn" class="btn btn-secondary"><i class="fas fa-arrow-up"></i> Top</button>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', (event) => {
 
-</body>
+        /* setup darkmode switch and save state to local storage */
+        const htmlElement = document.documentElement;
+        const switchElement = document.getElementById('darkModeSwitch');
+        // Set the default theme to dark if no setting is found in local storage
+        const currentTheme = localStorage.getItem('bsTheme') || 'dark';
+        htmlElement.setAttribute('data-bs-theme', currentTheme);
+        switchElement.checked = currentTheme === 'dark';
+        switchElement.addEventListener('change', function () {
+            if (this.checked) {
+                htmlElement.setAttribute('data-bs-theme', 'dark');
+                localStorage.setItem('bsTheme', 'dark');
+            } else {
+                htmlElement.setAttribute('data-bs-theme', 'light');
+                localStorage.setItem('bsTheme', 'light');
+            }
+        });
 
+        /* setup scroll to top button */
+        const scrollToTopBtn = document.getElementById("scrollToTopBtn");
+        window.onscroll = function() {
+            // Show the button when the user scrolls down 20px from the top
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollToTopBtn.style.display = "block";
+            } else {
+                scrollToTopBtn.style.display = "none";
+            }
+        };
+        scrollToTopBtn.onclick = function() {
+            // Scroll to the top of the page
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+    });
+    </script>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">PQCScan Results</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="darkModeSwitch" checked>
+          <label class="form-check-label" for="darkModeSwitch">Dark Mode</label>
+      </div>
+        </div>
+      </div>
+    </nav>
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link" id="query-tab" data-toggle="tab" href="#query" role="tab" aria-controls="query" aria-selected="true">Summary</a>
+      </li>
+      <li class="nav-item">
+          <a class="nav-link" id="query-tab" data-toggle="tab" href="#query" role="tab" aria-controls="query" aria-selected="true">SSH Results</a>
+      </li>
+      <li class="nav-item">
+          <a class="nav-link active" id="ssh-tab" data-toggle="tab" href="#ssh" role="tab" aria-controls="ssh" aria-selected="false">TLS Results</a>
+      </li>
+    </ul>
+
+    
+  <h3>Summary</h3>
+  ..
+  ..
+
+  <h3>TLS Scan Results</h3>
+
+  {% for hostname in tls_sorted_hosts %}
+    {% set tmp = tls_results[hostname] %}
+    {% for tmp2 in tmp %}
+    {% set result = tmp2['Tls'] %}
+
+    <div>{{hostname}} {{ result['addr'] }} {{ result['targetspec']['port'] }}</div>
+
+    {% endfor %}
+  {% endfor %}
+
+  <h3>SSH Scan Results</h3>
+
+  {% for hostname in ssh_sorted_hosts %}
+    {% set tmp = ssh_results[hostname] %}
+    {% for tmp2 in tmp %}
+    {% set result = tmp2['Ssh'] %}
+
+    <div>{{hostname}} {{ result['addr'] }} {{ result['targetspec']['port'] }}</div>
+
+    {% endfor %}
+  {% endfor %}
+
+
+
+  </body>
 </html>
