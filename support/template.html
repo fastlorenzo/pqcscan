@@ -87,26 +87,61 @@
     <div class="tab-content">
       <div class="tab-pane active" id="summary" role="tabpanel" aria-labelledby="summary-tab">
  
-        <h3>Summary</h3>
+        <h3 class="text-center">Summary</h3>
       ..
       ..
     
     
       </div>
       <div class="tab-pane fade" id="ssh" role="tabpanel" aria-labelledby="ssh-tab">
-        <h3>SSH Scan Results</h3>
+        <h3 class="text-center">SSH Scan Results</h3>
+
+
         {% for hostname in ssh_sorted_hosts %}
-          {% set tmp = ssh_results[hostname] %}
-          {% for tmp2 in tmp %}
-          {% set result = tmp2['Ssh'] %}
-      
-          <div>{{hostname}} {{ result['addr'] }} {{ result['targetspec']['port'] }}</div>
-      
-          {% endfor %}
+
+        <div class="container">
+          <div class="row row-gap-3">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  {{hostname}}
+                </div>
+                <div class="card-body">
+
+                 
+                    {% set tmp = ssh_results[hostname] %}
+                    {% for tmp2 in tmp %}
+                      <table class="table table-sm">
+                        <tbody>
+                          {% set result = tmp2['Ssh'] %}
+                          <tr>
+                            <th width="20%">Port</th>
+                            <td>{{ result['targetspec']['port'] }}</td>
+                          </tr>
+                          <tr>
+                            <th width="20%">Error</th>
+                            <td>{{ result['error'] }}</td>
+                          </tr>
+                          <tr>
+                            <th width="20%">PQC Supported</th>
+                            <td>{{ result['pqc_supported']}}</td>
+                          </tr>
+                          <tr>
+                            <th width="20%">PQC Algorithms</th>
+                            <td>{{ result['pqc_algos'] }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         {% endfor %}
       </div>
       <div class="tab-pane fade" id="tls" role="tabpanel" aria-labelledby="tls-tab">
-        <h3>TLS Scan Results</h3>
+        <h3 class="text-center">TLS Scan Results</h3>
 
         {% for hostname in tls_sorted_hosts %}
           {% set tmp = tls_results[hostname] %}
