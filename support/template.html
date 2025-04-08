@@ -2,13 +2,12 @@
 <head>
 <title>{{ title }}</title>
 </head>
-<body>
-{% for result in results %}
-  {% if 'Ssh' in result %}
-    {% set r = result['Ssh'] %}
-    <div>{{ r['addr'] }}</div>
-    <div>{{ r['targetspec'] }}</div>
-  {% endif %}
+<body> 
+{% for hostname in tls_sorted_hosts %}
+  {% set result = tls_results[hostname] %}
+    <div>{{ result.targetspec }}</div>
 {% endfor %}
+
 </body>
+
 </html>

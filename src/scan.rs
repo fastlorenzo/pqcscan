@@ -19,6 +19,7 @@ pub enum ScanResult {
     },
     Tls {
         targetspec: Target,
+        addr: Option<String>,
         error: Option<String>,
         pqc_supported: bool,
         pqc_algos: Option<Vec<String>>,

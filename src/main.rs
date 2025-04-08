@@ -4,11 +4,13 @@ use clap::{Arg, Command, ArgAction, ArgMatches, crate_version};
 use std::path::PathBuf;
 use std::io::{BufReader, BufRead, BufWriter};
 use std::fs::File;
+use std::collections::HashMap;
 use tokio::runtime::Runtime;
 use std::sync::Arc;
 use rust_embed::RustEmbed;
 use tera::{Tera, Context};
 use chrono::prelude::*;
+use serde::Serialize;
 
 mod config;
 mod utils;
@@ -97,26 +99,73 @@ fn get_targets(matches: &ArgMatches, default_port: Option<u16>) -> Result<Vec<Ta
     }
 }
 
+#[derive(Serialize)]
+struct ReportResults {
+    tls_results: HashMap<String, ScanResult>,
+    tls_sorted_hosts: Vec<String>,
+    ssh_results: HashMap<String, ScanResult>,
+    ssh_sorted_hosts: Vec<String>
+}
+
 fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
-    println!("{:?}", input_files);
-    let mut results: Vec<ScanResult> = vec![];
     let mut start_time: DateTime<Utc>;
     let mut end_time: DateTime<Utc>;
 
-    for input_file in input_files {
+    let mut tls_map: HashMap<String, ScanResult> = HashMap::new();
+    let mut ssh_map: HashMap<String, ScanResult> = HashMap::new();
+    let mut tls_hosts: Vec<String> = Vec::new();
+    let mut ssh_hosts: Vec<String> = Vec::new();
 
+    for input_file in input_files {
         log::debug!("Opening and parsing {}", input_file);
+
         let mut file = File::open(input_file)?;
         let scan: Scan = serde_json::from_reader(file).expect("failed to open input file");
+
+        if scan.version != crate_version!() {
+            let err = format!("Version mismatch: {} != {} in {}", scan.version, crate_version!(), input_file);
+            log::warn!("{}", err);
+            return Err(anyhow!(err));
+        }
+
+        for result in scan.results {
+            match result {
+                ScanResult::Ssh {ref targetspec, ref addr, ref error, pqc_supported, ref pqc_algos, ref nonpqc_algos} => {
+                    tls_hosts.push(targetspec.host.clone());
+                    tls_map.insert(targetspec.host.clone(), result);
+                    
+                },
+                ScanResult::Tls {ref targetspec, ref addr, ref error, pqc_supported, ref pqc_algos, ref hybrid_algos} => {
+                    ssh_hosts.push(targetspec.host.clone());
+                    ssh_map.insert(targetspec.host.clone(), result);
+                },
+                _ => { 
+                    panic!("Unexpected result type");
+                }
+            }
+        }
     }
 
+
+    println!("{} TLS results, {} SSH results", tls_map.len(), ssh_map.len());
+
+    tls_hosts.sort();
+    ssh_hosts.sort();
+
+    let mut results: ReportResults = ReportResults {
+        tls_results: tls_map,
+        tls_sorted_hosts: tls_hosts,
+        ssh_results: ssh_map,
+        ssh_sorted_hosts: ssh_hosts
+    };
 
     let mut tera = Tera::default();
     let html_file = EmbeddedResources::get("template.html").unwrap();
     let html_data = std::str::from_utf8(html_file.data.as_ref())?;
     tera.add_raw_template("template.html", html_data)?;
-    let mut ctx = Context::from_serialize(&results)?;
-    //ctx.insert("title", "wut");
+    let mut ctx = Context::from_serialize(results)?;
+    
+    ctx.insert("title", "wut");
 
     println!("{}", tera.render("template.html", &ctx)?);
 

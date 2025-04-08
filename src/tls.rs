@@ -6,11 +6,11 @@ use crate::scan::ScanResult;
 
 use anyhow::{anyhow, Result};
 use std::io::{Cursor, Read, Write};
-//use tokio::io::AsyncWriteExt;
 use std::net::{TcpStream, ToSocketAddrs};
 use rand::{Rng, rng, thread_rng};
 use byteorder::{ByteOrder, NetworkEndian, WriteBytesExt, ReadBytesExt};
 use clap::{command, arg};
+use std::net::SocketAddr;
 
 use crate::tlsconstants::{CipherSuite, SigScheme, Group, KeyShareLengths, GroupDescription, TlsAlerts};
 use crate::utils::socket_create_and_connect;
@@ -431,6 +431,8 @@ pub async fn tls_scan_target(config: &Arc<Config>, target: &Target) -> ScanResul
         */
     ];
 
+    let mut addr: Option<String> = None;
+
     for group in groups {
 
         let ret = socket_create_and_connect(&target, config.connection_timeout).await;
@@ -438,13 +440,15 @@ pub async fn tls_scan_target(config: &Arc<Config>, target: &Target) -> ScanResul
             log::trace!("Could not connect to {target}");
             return ScanResult::Tls {
                 targetspec: target.clone(),
+                addr: None,
                 error: Some(ret.unwrap_err().to_string()),
                 pqc_supported: false,
                 pqc_algos: None,
                 hybrid_algos: None
             };
         }
-        let (addr, stream) = ret.unwrap();
+        let (_addr, stream) = ret.unwrap();
+        addr = Some(_addr.to_string());
         let mut stream = stream.into_std().unwrap();
         stream.set_nonblocking(false).unwrap();
 
@@ -465,6 +469,7 @@ pub async fn tls_scan_target(config: &Arc<Config>, target: &Target) -> ScanResul
     log::trace!("Finished TLS scanning {}", target);
     let ret = ScanResult::Tls {
         targetspec: target.clone(),
+        addr: addr,
         error: None,
         pqc_supported: pqc_supported,
         pqc_algos: Some(pqc_algos),
