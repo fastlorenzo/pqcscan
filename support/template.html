@@ -60,36 +60,64 @@
         };
 
         /* setup filter settings buttons */
-        const hideErrorScansElement = document.getElementById('hideErrorScans');
-        hideErrorScansElement.checked = false;
+        const hideErrorScansElement = document.getElementById('showErrorScans');
+        hideErrorScansElement.checked = true;
         hideErrorScansElement.addEventListener('change', function () {
             if (this.checked) {
-                $('.pqcscan-error').hide();
-            } else {
                 $('.pqcscan-error').show();
+            } else {
+                $('.pqcscan-error').hide();
             }
         });
-        const hideOkScansElement = document.getElementById('hideOkScans');
-        hideOkScansElement.checked = false;
+        const hideOkScansElement = document.getElementById('showOkScans');
+        hideOkScansElement.checked = true;
         hideOkScansElement.addEventListener('change', function () {
             if (this.checked) {
-              document.getElementById('pqcSupportedOnly').checked = false;
-                $('.pqcscan-ok').hide();
-                $('.pqcscan-error').show();
-            } else {
                 $('.pqcscan-ok').show();
-                $('.pqcscan-error').hide();
+                $('.pqc-notsupported').show();
+                $('.pqc-supported').show();
+                if (!document.getElementById('showErrorScans').checked) {
+                  $('.pqcscan-error').hide();
+                }
+            } else {
+              document.getElementById('pqcSupportedOnly').checked = false;
+              document.getElementById('nonpqcSupportedOnly').checked = false;
+              $('.pqcscan-ok').hide();
             }
         });
         const showPQCOnlyElement = document.getElementById('pqcSupportedOnly');
         showPQCOnlyElement.checked = false;
         showPQCOnlyElement.addEventListener('change', function () {
             if (this.checked) {
-                document.getElementById('hideOkScans').checked = false;
-                $('.pqcscan-ok').show();
                 $('.pqc-notsupported').hide();
+                $('.pqc-supported').show();
+                document.getElementById('showOkScans').checked = true;
+                document.getElementById('nonpqcSupportedOnly').checked = false;
             } else {
                 $('.pqc-notsupported').show();
+                $('.pqc-supported').show();
+                if (!document.getElementById('showErrorScans').checked) {
+                  $('.pqcscan-error').hide();
+                }
+            }
+        });
+        const nonpqcSupportedOnlyElement = document.getElementById('nonpqcSupportedOnly');
+        nonpqcSupportedOnlyElement.checked = false;
+        nonpqcSupportedOnlyElement.addEventListener('change', function () {
+            if (this.checked) {
+                $('.pqc-notsupported').show();
+                $('.pqc-supported').hide();
+                if (!document.getElementById('showErrorScans').checked) {
+                  $('.pqcscan-error').hide();
+                }
+                document.getElementById('showOkScans').checked = true;
+                document.getElementById('pqcSupportedOnly').checked = false;
+            } else {
+                $('.pqc-notsupported').show();
+                $('.pqc-supported').show();
+                if (!document.getElementById('showErrorScans').checked) {
+                  $('.pqcscan-error').hide();
+                }
             }
         });
     });
@@ -138,16 +166,20 @@
                 </div>
                 <div class="card-body">
                   <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="hideErrorScans" checked>
-                    <label class="form-check-label" for="hideErrorScans">Hide Erroneous Scans</label>
+                    <input class="form-check-input" type="checkbox" id="showErrorScans" checked>
+                    <label class="form-check-label" for="showErrorScans">Show Erroneous Scans</label>
                   </div>
                   <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="hideOkScans" checked>
-                    <label class="form-check-label" for="hideOkScans">Hide Successful Scans</label>
+                    <input class="form-check-input" type="checkbox" id="showOkScans" checked>
+                    <label class="form-check-label" for="showOkScans">Show Successful Scans</label>
                   </div>
                   <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="pqcSupportedOnly" checked>
                     <label class="form-check-label" for="pqcSupportedOnly">PQC Supported Only</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="nonpqcSupportedOnly" checked>
+                    <label class="form-check-label" for="nonpqcSupportedOnly">Non-PQC Supported Only</label>
                   </div>
                 </div>
               </div>
@@ -198,18 +230,22 @@
                           {% else %}
                           <tr>
                             <th width="20%">PQC Supported</th>
-                            <td class="text-success">{{ result['pqc_supported']}}</td>
-                          </tr>
-                          <tr>
-                            <th width="20%">PQC Algorithms</th>
-                            <td>
-                              {% for algo in result['pqc_algos'] | sort %}
-                                {{ algo }}{% if not loop.last %}, {% endif %}
-                              {% endfor %}
-                            </td>
+
+                            {% if result['pqc_supported'] %}
+                              <td class="text-success">{{ result['pqc_supported']}}</td>
+                              <tr>
+                                <th width="20%">PQC Algorithms</th>
+                                <td>
+                                  {% for algo in result['pqc_algos'] | sort %}
+                                    {{ algo }}{% if not loop.last %}, {% endif %}
+                                  {% endfor %}
+                                </td>
+                              </tr>
+                            {% else %}
+                              <td class="text-warning">{{ result['pqc_supported']}}</td>
+                            {% endif %}
                           </tr>
                           {% endif %}
-
                         </tbody>
                       </table>
                     {% endfor %}
