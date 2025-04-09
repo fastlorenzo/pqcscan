@@ -123,6 +123,8 @@
     });
     </script>
 
+    {% include ["template2.html"] %}
+
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">PQCScan Results</a>
@@ -132,6 +134,7 @@
         </div>
       </div>
     </nav>
+    <div style="padding: 1rem"></div>
     <nav>
       <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item active">
@@ -148,14 +151,18 @@
     <div class="tab-content">
       <div class="tab-pane active" id="summary" role="tabpanel" aria-labelledby="summary-tab">
  
+        <div style="padding: 1rem"></div>
         <h3 class="text-center">Summary</h3>
+        <div style="padding: 1rem"></div>
       ..
       ..
     
     
       </div>
       <div class="tab-pane fade" id="ssh" role="tabpanel" aria-labelledby="ssh-tab">
+        <div style="padding: 1rem"></div>
         <h3 class="text-center">SSH Scan Results</h3>
+        <div style="padding: 1rem"></div>
 
         <div class="container">
           <div class="row row-gap-3 d-flex justify-content-center">
@@ -188,6 +195,8 @@
         </div>
         
         {% for hostname in ssh_sorted_hosts %}
+
+        <div style="padding: 1rem"></div>
 
         <div class="container">
           <div class="row row-gap-3">
@@ -257,7 +266,9 @@
         {% endfor %}
       </div>
       <div class="tab-pane fade" id="tls" role="tabpanel" aria-labelledby="tls-tab">
+        <div style="padding: 1rem"></div>
         <h3 class="text-center">TLS Scan Results</h3>
+        <div style="padding: 1rem"></div>
 
         {% for hostname in tls_sorted_hosts %}
           {% set tmp = tls_results[hostname] %}
@@ -270,6 +281,7 @@
         {% endfor %}
       </div>
     </div>
+    <div style="padding: 1rem"></div>
     <footer class="text-center mt-auto py-3 navbar navbar-expand-lg bg-body-tertiary">
        <div class="col-md-12 text-center text-muted">
          &copy; 2025 Anvil Secure Inc. All rights reserved.

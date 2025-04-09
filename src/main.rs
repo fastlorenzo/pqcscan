@@ -24,8 +24,7 @@ use crate::config::Config;
 use crate::scan::{Scan, ScanType, ScanOptions, ScanResult, scan_runner};
 
 #[derive(RustEmbed)]
-#[folder = "$CARGO_MANIFEST_DIR/support"]
-#[include = "template.html"]
+#[folder = "$CARGO_MANIFEST_DIR/support/templates/"]
 struct EmbeddedResources;
 
 fn output_args(file_type: &str, req: bool) -> Vec<clap::Arg> {
@@ -168,6 +167,10 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
     let html_file = EmbeddedResources::get("template.html").unwrap();
     let html_data = std::str::from_utf8(html_file.data.as_ref())?;
     tera.add_raw_template("template.html", html_data)?;
+    let html_file = EmbeddedResources::get("template2.html").unwrap();
+    let html_data = std::str::from_utf8(html_file.data.as_ref())?;
+    tera.add_raw_template("template2.html", html_data)?;
+
     let mut ctx = Context::from_serialize(results)?;
     
     ctx.insert("title", "wut");
