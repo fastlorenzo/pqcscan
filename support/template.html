@@ -58,6 +58,40 @@
             // Scroll to the top of the page
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
+
+        /* setup filter settings buttons */
+        const hideErrorScansElement = document.getElementById('hideErrorScans');
+        hideErrorScansElement.checked = false;
+        hideErrorScansElement.addEventListener('change', function () {
+            if (this.checked) {
+                $('.pqcscan-error').hide();
+            } else {
+                $('.pqcscan-error').show();
+            }
+        });
+        const hideOkScansElement = document.getElementById('hideOkScans');
+        hideOkScansElement.checked = false;
+        hideOkScansElement.addEventListener('change', function () {
+            if (this.checked) {
+              document.getElementById('pqcSupportedOnly').checked = false;
+                $('.pqcscan-ok').hide();
+                $('.pqcscan-error').show();
+            } else {
+                $('.pqcscan-ok').show();
+                $('.pqcscan-error').hide();
+            }
+        });
+        const showPQCOnlyElement = document.getElementById('pqcSupportedOnly');
+        showPQCOnlyElement.checked = false;
+        showPQCOnlyElement.addEventListener('change', function () {
+            if (this.checked) {
+                document.getElementById('hideOkScans').checked = false;
+                $('.pqcscan-ok').show();
+                $('.pqc-notsupported').hide();
+            } else {
+                $('.pqc-notsupported').show();
+            }
+        });
     });
     </script>
 
@@ -67,7 +101,6 @@
         <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" id="darkModeSwitch" checked>
           <label class="form-check-label" for="darkModeSwitch">Dark Mode</label>
-      </div>
         </div>
       </div>
     </nav>
@@ -96,7 +129,32 @@
       <div class="tab-pane fade" id="ssh" role="tabpanel" aria-labelledby="ssh-tab">
         <h3 class="text-center">SSH Scan Results</h3>
 
-
+        <div class="container">
+          <div class="row row-gap-3 d-flex justify-content-center">
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <h5>Filter Settings</h5>
+                </div>
+                <div class="card-body">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="hideErrorScans" checked>
+                    <label class="form-check-label" for="hideErrorScans">Hide Erroneous Scans</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="hideOkScans" checked>
+                    <label class="form-check-label" for="hideOkScans">Hide Successful Scans</label>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="pqcSupportedOnly" checked>
+                    <label class="form-check-label" for="pqcSupportedOnly">PQC Supported Only</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         {% for hostname in ssh_sorted_hosts %}
 
         <div class="container">
@@ -104,32 +162,54 @@
             <div class="col-md-12">
               <div class="card">
                 <div class="card-header">
-                  {{hostname}}
+                  <h5>{{hostname}}</h5>
                 </div>
                 <div class="card-body">
 
                  
                     {% set tmp = ssh_results[hostname] %}
                     {% for tmp2 in tmp %}
-                      <table class="table table-sm">
+                      {% set result = tmp2['Ssh'] %}
+
+                      {% if result['error'] %}
+                      <table class="table table-sm pqcscan-error pqc-notsupported">
+                      {% else %}
+                        {% if result['pqc_supported'] %}
+                        <table class="table table-sm pqcscan-ok pqc-supported">
+                        {% else %}
+                        <table class="table table-sm pqcscan-ok pqc-notsupported">
+                        {% endif %}                      
+                      {% endif %}
+
                         <tbody>
-                          {% set result = tmp2['Ssh'] %}
+                          
+                          <tr>
+                            <th width="100%" colspan="2" class="text-center">&nbsp;</th>
+                          </tr>
                           <tr>
                             <th width="20%">Port</th>
                             <td>{{ result['targetspec']['port'] }}</td>
                           </tr>
+                          {% if result['error'] %}
                           <tr>
                             <th width="20%">Error</th>
-                            <td>{{ result['error'] }}</td>
+                            <td class="text-danger">{{ result['error'] }}</td>
                           </tr>
+                          {% else %}
                           <tr>
                             <th width="20%">PQC Supported</th>
-                            <td>{{ result['pqc_supported']}}</td>
+                            <td class="text-success">{{ result['pqc_supported']}}</td>
                           </tr>
                           <tr>
                             <th width="20%">PQC Algorithms</th>
-                            <td>{{ result['pqc_algos'] }}</td>
+                            <td>
+                              {% for algo in result['pqc_algos'] | sort %}
+                                {{ algo }}{% if not loop.last %}, {% endif %}
+                              {% endfor %}
+                            </td>
                           </tr>
+                          {% endif %}
+
                         </tbody>
                       </table>
                     {% endfor %}
