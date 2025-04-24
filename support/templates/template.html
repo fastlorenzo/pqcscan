@@ -58,68 +58,6 @@
             // Scroll to the top of the page
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
-
-        /* setup filter settings buttons */
-        const hideErrorScansElement = document.getElementById('showErrorScans');
-        hideErrorScansElement.checked = true;
-        hideErrorScansElement.addEventListener('change', function () {
-            if (this.checked) {
-                $('.pqcscan-error').show();
-            } else {
-                $('.pqcscan-error').hide();
-            }
-        });
-        const hideOkScansElement = document.getElementById('showOkScans');
-        hideOkScansElement.checked = true;
-        hideOkScansElement.addEventListener('change', function () {
-            if (this.checked) {
-                $('.pqcscan-ok').show();
-                $('.pqc-notsupported').show();
-                $('.pqc-supported').show();
-                if (!document.getElementById('showErrorScans').checked) {
-                  $('.pqcscan-error').hide();
-                }
-            } else {
-              document.getElementById('pqcSupportedOnly').checked = false;
-              document.getElementById('nonpqcSupportedOnly').checked = false;
-              $('.pqcscan-ok').hide();
-            }
-        });
-        const showPQCOnlyElement = document.getElementById('pqcSupportedOnly');
-        showPQCOnlyElement.checked = false;
-        showPQCOnlyElement.addEventListener('change', function () {
-            if (this.checked) {
-                $('.pqc-notsupported').hide();
-                $('.pqc-supported').show();
-                document.getElementById('showOkScans').checked = true;
-                document.getElementById('nonpqcSupportedOnly').checked = false;
-            } else {
-                $('.pqc-notsupported').show();
-                $('.pqc-supported').show();
-                if (!document.getElementById('showErrorScans').checked) {
-                  $('.pqcscan-error').hide();
-                }
-            }
-        });
-        const nonpqcSupportedOnlyElement = document.getElementById('nonpqcSupportedOnly');
-        nonpqcSupportedOnlyElement.checked = false;
-        nonpqcSupportedOnlyElement.addEventListener('change', function () {
-            if (this.checked) {
-                $('.pqc-notsupported').show();
-                $('.pqc-supported').hide();
-                if (!document.getElementById('showErrorScans').checked) {
-                  $('.pqcscan-error').hide();
-                }
-                document.getElementById('showOkScans').checked = true;
-                document.getElementById('pqcSupportedOnly').checked = false;
-            } else {
-                $('.pqc-notsupported').show();
-                $('.pqc-supported').show();
-                if (!document.getElementById('showErrorScans').checked) {
-                  $('.pqcscan-error').hide();
-                }
-            }
-        });
     });
     </script>
    

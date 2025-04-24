@@ -1,0 +1,98 @@
+{% macro filter_settings(type) %}
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+       /* setup filter settings buttons */
+       const hideErrorScansElement = document.getElementById('showErrorScans_{{type}}');
+        hideErrorScansElement.checked = true;
+        hideErrorScansElement.addEventListener('change', function () {
+            if (this.checked) {
+                $('.pqcscan-error').show();
+            } else {
+                $('.pqcscan-error').hide();
+            }
+        });
+        const hideOkScansElement = document.getElementById('showOkScans_{{type}}');
+        hideOkScansElement.checked = true;
+        hideOkScansElement.addEventListener('change', function () {
+            if (this.checked) {
+                $('.pqcscan-ok').show();
+                $('.pqc-notsupported').show();
+                $('.pqc-supported').show();
+                if (!document.getElementById('showErrorScans_{{type}}').checked) {
+                  $('.pqcscan-error').hide();
+                }
+            } else {
+              document.getElementById('pqcSupportedOnly_{{type}}').checked = false;
+              document.getElementById('nonpqcSupportedOnly_{{type}}').checked = false;
+              $('.pqcscan-ok').hide();
+            }
+        });
+        const showPQCOnlyElement = document.getElementById('pqcSupportedOnly_{{type}}');
+        showPQCOnlyElement.checked = false;
+        showPQCOnlyElement.addEventListener('change', function () {
+            if (this.checked) {
+                $('.pqc-notsupported').hide();
+                $('.pqc-supported').show();
+                document.getElementById('showOkScans_{{type}}').checked = true;
+                document.getElementById('nonpqcSupportedOnly_{{type}}').checked = false;
+            } else {
+                $('.pqc-notsupported').show();
+                $('.pqc-supported').show();
+                if (!document.getElementById('showErrorScans_{{type}}').checked) {
+                  $('.pqcscan-error').hide();
+                }
+            }
+        });
+        const nonpqcSupportedOnlyElement = document.getElementById('nonpqcSupportedOnly_{{type}}');
+        nonpqcSupportedOnlyElement.checked = false;
+        nonpqcSupportedOnlyElement.addEventListener('change', function () {
+            if (this.checked) {
+                $('.pqc-notsupported').show();
+                $('.pqc-supported').hide();
+                if (!document.getElementById('showErrorScans_{{type}}').checked) {
+                  $('.pqcscan-error').hide();
+                }
+                document.getElementById('showOkScans_{{type}}').checked = true;
+                document.getElementById('pqcSupportedOnly_{{type}}').checked = false;
+            } else {
+                $('.pqc-notsupported').show();
+                $('.pqc-supported').show();
+                if (!document.getElementById('showErrorScans_{{type}}').checked) {
+                  $('.pqcscan-error').hide();
+                }
+            }
+        });
+    });
+    </script>
+</script>
+
+<div class="container">
+    <div class="row row-gap-3 d-flex justify-content-center">
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h5>Filter Settings</h5>
+          </div>
+          <div class="card-body">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="showErrorScans_{{type}}" checked>
+              <label class="form-check-label" for="showErrorScans_{{type}}">Show Erroneous Scans</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="showOkScans_{{type}}" checked>
+              <label class="form-check-label" for="showOkScans_{{type}}">Show Successful Scans</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="pqcSupportedOnly_{{type}}" checked>
+              <label class="form-check-label" for="pqcSupportedOnly_{{type}}">PQC Supported Only</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="nonpqcSupportedOnly_{{type}}" checked>
+              <label class="form-check-label" for="nonpqcSupportedOnly_{{type}}">Non-PQC Supported Only</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+{% endmacro filter_settings %}

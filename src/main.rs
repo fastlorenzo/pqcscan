@@ -163,7 +163,17 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
         ssh_sorted_hosts: ssh_hosts
     };
 
+    let templates = ["template.html", "macros.html", "ssh_results.html", "tls_results.html"];
     let mut tera = Tera::default();
+
+    for template in templates {
+        let html_file = EmbeddedResources::get(template).unwrap();
+        let html_data = std::str::from_utf8(html_file.data.as_ref())?;
+        tera.add_raw_template(template, html_data)?;
+    }
+
+    /*
+    
     let html_file = EmbeddedResources::get("template.html").unwrap();
     let html_data = std::str::from_utf8(html_file.data.as_ref())?;
     tera.add_raw_template("template.html", html_data)?;
@@ -179,6 +189,7 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
     let html_file = EmbeddedResources::get("filter_settings.html").unwrap();
     let html_data = std::str::from_utf8(html_file.data.as_ref())?;
     tera.add_raw_template("filter_settings.html", html_data)?;
+    */
 
     let mut ctx = Context::from_serialize(results)?;
     
