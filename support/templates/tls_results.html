@@ -50,6 +50,19 @@
 
                     {% if result['pqc_supported'] %}
                         <td class="text-success">{{ result['pqc_supported']}}</td>
+                        <tr>
+                            <th width="20%">PQC Algorithms</th>
+                            <td>
+                                {% if result['pqc_algos'] and result['pqc_algos'].count > 0 %}
+                                    {% for algo in result['pqc_algos'] | sort %}
+                                        {{ algo }}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                {% for algo in result['hybrid_algos'] | sort %}
+                                    {{ algo }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </td>
+                          </tr>
                     {% else %}
                         <td class="text-warning">{{ result['pqc_supported']}}</td>
                     {% endif %}

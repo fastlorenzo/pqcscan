@@ -163,7 +163,7 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
         ssh_sorted_hosts: ssh_hosts
     };
 
-    let templates = ["template.html", "macros.html", "ssh_results.html", "tls_results.html"];
+    let templates = ["template.html", "macros.html", "ssh_results.html", "tls_results.html", "summary.html"];
     let mut tera = Tera::default();
 
     for template in templates {

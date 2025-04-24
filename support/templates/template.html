@@ -87,14 +87,7 @@
     </nav>
     <div class="tab-content">
       <div class="tab-pane active" id="summary" role="tabpanel" aria-labelledby="summary-tab">
- 
-        <div style="padding: 1rem"></div>
-        <h3 class="text-center">Summary</h3>
-        <div style="padding: 1rem"></div>
-      ..
-      ..
-    
-    
+        {% include ["summary.html"] %}
       </div>
       <div class="tab-pane fade" id="ssh" role="tabpanel" aria-labelledby="ssh-tab">
         {% include ["ssh_results.html"] %}
