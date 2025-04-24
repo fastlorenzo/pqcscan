@@ -8,7 +8,36 @@
     <div class="row row-gap-3 d-flex justify-content-center">
         <div class="col-md-8">
             <div class="card">
+                <div class="card-header">
+                    <h5>Scan Statistics</h5>
+                </div>
                 <div class="card-body">
+                    <table class="table table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>&nbsp;</th>
+                                <th>Total</th>
+                                <th>PQC Supported</th>
+                                <th>Success</th>
+                                <th>Failed</th>
+                            </tr>
+                        <tbody>
+                            <tr>
+                            <th>SSH</th>
+                            <td>{{ ssh_total_count }}</td>
+                            <td>{{ ssh_pqc_supported_count }}</td>
+                            <td>{{ ssh_success_count }}</td>
+                            <td>{{ ssh_fail_count }}</td>
+                            </tr>
+                            <tr>
+                            <th>TLS</th>
+                            <td>{{ tls_total_count }}</td>
+                            <td>{{ tls_pqc_supported_count }}</td>
+                            <td>{{ tls_success_count }}</td>
+                            <td>{{ tls_fail_count }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

@@ -102,8 +102,16 @@ fn get_targets(matches: &ArgMatches, default_port: Option<u16>) -> Result<Vec<Ta
 struct ReportResults {
     tls_results: HashMap<String, Vec<ScanResult>>,
     tls_sorted_hosts: BTreeSet<String>,
+    tls_success_count: usize,
+    tls_fail_count: usize,
+    tls_pqc_supported_count: usize,
+    tls_total_count: usize,
     ssh_results: HashMap<String, Vec<ScanResult>>,
-    ssh_sorted_hosts: BTreeSet<String>
+    ssh_sorted_hosts: BTreeSet<String>,
+    ssh_success_count: usize,
+    ssh_fail_count: usize,
+    ssh_pqc_supported_count: usize,
+    ssh_total_count: usize
 }
 
 fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
@@ -114,6 +122,12 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
     let mut ssh_map: HashMap<String, Vec<ScanResult>> = HashMap::new();
     let mut tls_hosts: BTreeSet<String> = BTreeSet::new();
     let mut ssh_hosts: BTreeSet<String> = BTreeSet::new();
+    let mut ssh_pqc_supported_count: usize = 0;
+    let mut tls_pqc_supported_count: usize = 0;
+    let mut ssh_success_count: usize = 0;
+    let mut tls_success_count: usize = 0;
+    let mut ssh_total_count: usize = 0;
+    let mut tls_total_count: usize = 0;
 
     for input_file in input_files {
         log::debug!("Opening and parsing {}", input_file);
@@ -136,6 +150,13 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
                         ssh_map.insert(host.clone(), Vec::new());
                     }
                     let m = ssh_map.get_mut(&host).unwrap();
+                    if error.is_none() {
+                        ssh_success_count += 1;
+                    }
+                    if pqc_supported {
+                        ssh_pqc_supported_count += 1;
+                    }
+                    ssh_total_count += 1;
                     m.push(result);                    
                 },
                 ScanResult::Tls {ref targetspec, ref addr, ref error, pqc_supported, ref pqc_algos, ref hybrid_algos} => {
@@ -145,6 +166,13 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
                         tls_map.insert(host.clone(), Vec::new());
                     }
                     let m = tls_map.get_mut(&host).unwrap();
+                    if error.is_none() {
+                        tls_success_count += 1;
+                    }
+                    if pqc_supported {
+                        tls_pqc_supported_count += 1;
+                    }
+                    tls_total_count += 1;
                     m.push(result);
                 },
                 _ => { 
@@ -156,11 +184,22 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
 
     log::debug!("{} TLS results, {} SSH results", tls_map.len(), ssh_map.len());
 
+    let tls_fail_count = tls_total_count - tls_success_count;
+    let ssh_fail_count = ssh_total_count - ssh_success_count;
+
     let mut results: ReportResults = ReportResults {
         tls_results: tls_map,
         tls_sorted_hosts: tls_hosts,
+        tls_success_count: tls_success_count,
+        tls_pqc_supported_count: tls_pqc_supported_count,
+        tls_fail_count: tls_fail_count,
+        tls_total_count: tls_total_count,
         ssh_results: ssh_map,
-        ssh_sorted_hosts: ssh_hosts
+        ssh_sorted_hosts: ssh_hosts,
+        ssh_success_count: ssh_success_count,
+        ssh_fail_count: ssh_fail_count,
+        ssh_pqc_supported_count: ssh_pqc_supported_count,
+        ssh_total_count: ssh_total_count,
     };
 
     let templates = ["template.html", "macros.html", "ssh_results.html", "tls_results.html", "summary.html"];
@@ -171,25 +210,6 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
         let html_data = std::str::from_utf8(html_file.data.as_ref())?;
         tera.add_raw_template(template, html_data)?;
     }
-
-    /*
-    
-    let html_file = EmbeddedResources::get("template.html").unwrap();
-    let html_data = std::str::from_utf8(html_file.data.as_ref())?;
-    tera.add_raw_template("template.html", html_data)?;
-
-    let html_file = EmbeddedResources::get("ssh_results.html").unwrap();
-    let html_data = std::str::from_utf8(html_file.data.as_ref())?;
-    tera.add_raw_template("ssh_results.html", html_data)?
-    ;
-    let html_file = EmbeddedResources::get("tls_results.html").unwrap();
-    let html_data = std::str::from_utf8(html_file.data.as_ref())?;
-    tera.add_raw_template("tls_results.html", html_data)?;
-
-    let html_file = EmbeddedResources::get("filter_settings.html").unwrap();
-    let html_data = std::str::from_utf8(html_file.data.as_ref())?;
-    tera.add_raw_template("filter_settings.html", html_data)?;
-    */
 
     let mut ctx = Context::from_serialize(results)?;
     
