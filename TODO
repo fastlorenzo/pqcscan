@@ -1,2 +1,3 @@
 - hide the full host/nodes when they have no valid entries due to filtering
 - hide the SSH/TLS results tab if there are no results from there present
+- move TLS algo's etc to a JSON file t oo like we do for SSH
