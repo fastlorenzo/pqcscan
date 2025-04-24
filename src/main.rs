@@ -282,7 +282,7 @@ fn main() -> Result<()> {
                         .short('i')
                         .long("input")
                         .value_name("JSON file")
-                        .help("JSON file containing scan results ")
+                        .help("JSON file(s) containing scan results ")
                         .num_args(0..)
                 ])
                 .next_help_heading("Output")
