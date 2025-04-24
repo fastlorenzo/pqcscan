@@ -33,11 +33,11 @@ pub struct Scan {
     pub results: Vec<ScanResult>,
     pub start_time: DateTime<Utc>,
     pub end_time: DateTime<Utc>,
-    pub version: String
-    
+    pub version: String,
+    pub scan_type: ScanType
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Deserialize, Serialize)]
 pub enum ScanType {
     Ssh,
     Tls
@@ -134,7 +134,9 @@ pub async fn scan_runner(config: Arc<Config>, scan: ScanOptions) -> Scan {
        results: results,
        start_time: start_time,
        end_time: Utc::now(),
-       version: clap::crate_version!().to_string()
+       version: clap::crate_version!().to_string(),
+       scan_type: scan.scan_type.unwrap()
+
     };
 
     log::info!("Done scanning. All threads exited.");

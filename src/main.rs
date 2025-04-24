@@ -111,13 +111,21 @@ struct ReportResults {
     ssh_success_count: usize,
     ssh_fail_count: usize,
     ssh_pqc_supported_count: usize,
-    ssh_total_count: usize
+    ssh_total_count: usize,
+    scan_windows: Vec<ScanWindow>
+}
+
+#[derive(Serialize)]
+struct ScanWindow {
+    start_time: DateTime<Utc>,
+    end_time: DateTime<Utc>,
+    scan_type: ScanType
 }
 
 fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
     let mut start_time: DateTime<Utc>;
+    
     let mut end_time: DateTime<Utc>;
-
     let mut tls_map: HashMap<String, Vec<ScanResult>> = HashMap::new();
     let mut ssh_map: HashMap<String, Vec<ScanResult>> = HashMap::new();
     let mut tls_hosts: BTreeSet<String> = BTreeSet::new();
@@ -128,6 +136,7 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
     let mut tls_success_count: usize = 0;
     let mut ssh_total_count: usize = 0;
     let mut tls_total_count: usize = 0;
+    let mut scan_windows = Vec::new();
 
     for input_file in input_files {
         log::debug!("Opening and parsing {}", input_file);
@@ -140,6 +149,13 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
             log::warn!("{}", err);
             return Err(anyhow!(err));
         }
+
+        let window = ScanWindow {
+            start_time: scan.start_time,
+            end_time: scan.end_time,
+            scan_type: scan.scan_type
+        };
+        scan_windows.push(window);
 
         for result in scan.results {
             match result {
@@ -200,6 +216,7 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
         ssh_fail_count: ssh_fail_count,
         ssh_pqc_supported_count: ssh_pqc_supported_count,
         ssh_total_count: ssh_total_count,
+        scan_windows: scan_windows
     };
 
     let templates = ["template.html", "macros.html", "ssh_results.html", "tls_results.html", "summary.html"];
@@ -213,7 +230,8 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
 
     let mut ctx = Context::from_serialize(results)?;
     
-    ctx.insert("title", "wut");
+    let dt = Utc::now().format("%Y-%m-%d %H:%M:%S %Z").to_string();
+    ctx.insert("title", &dt);
 
     log::trace!("Tera Template: {:?}", ctx);
 
