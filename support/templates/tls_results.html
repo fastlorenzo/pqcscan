@@ -8,9 +8,11 @@
 
 {% for hostname in tls_sorted_hosts %}
 
+<div style="padding: 1rem"></div>
+
   {% set tmp = tls_results[hostname] %}
   {% for tmp2 in tmp %}
-  {% set result = tmp2['Tls'] %}
+    {% set result = tmp2['Tls'] %}
 
     <div class="container">
     <div class="row row-gap-3">
@@ -72,6 +74,8 @@
                 </table>
             </div>
         </div>
+    </div>
+    </div>
     </div>
   {% endfor %}
 {% endfor %}
