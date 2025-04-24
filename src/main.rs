@@ -167,9 +167,18 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
     let html_file = EmbeddedResources::get("template.html").unwrap();
     let html_data = std::str::from_utf8(html_file.data.as_ref())?;
     tera.add_raw_template("template.html", html_data)?;
-    let html_file = EmbeddedResources::get("template2.html").unwrap();
+
+    let html_file = EmbeddedResources::get("ssh_results.html").unwrap();
     let html_data = std::str::from_utf8(html_file.data.as_ref())?;
-    tera.add_raw_template("template2.html", html_data)?;
+    tera.add_raw_template("ssh_results.html", html_data)?
+    ;
+    let html_file = EmbeddedResources::get("tls_results.html").unwrap();
+    let html_data = std::str::from_utf8(html_file.data.as_ref())?;
+    tera.add_raw_template("tls_results.html", html_data)?;
+
+    let html_file = EmbeddedResources::get("filter_settings.html").unwrap();
+    let html_data = std::str::from_utf8(html_file.data.as_ref())?;
+    tera.add_raw_template("filter_settings.html", html_data)?;
 
     let mut ctx = Context::from_serialize(results)?;
     

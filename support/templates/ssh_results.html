@@ -1,0 +1,76 @@
+<div style="padding: 1rem"></div>
+<h3 class="text-center">SSH Scan Results</h3>
+<div style="padding: 1rem"></div>
+
+{% include ["filter_settings.html"] %}
+
+{% for hostname in ssh_sorted_hosts %}
+
+<div style="padding: 1rem"></div>
+
+<div class="container">
+  <div class="row row-gap-3">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h5>{{hostname}}</h5>
+        </div>
+        <div class="card-body">
+
+         
+            {% set tmp = ssh_results[hostname] %}
+            {% for tmp2 in tmp %}
+              {% set result = tmp2['Ssh'] %}
+
+              {% if result['error'] %}
+              <table class="table table-sm pqcscan-error pqc-notsupported">
+              {% else %}
+                {% if result['pqc_supported'] %}
+                <table class="table table-sm pqcscan-ok pqc-supported">
+                {% else %}
+                <table class="table table-sm pqcscan-ok pqc-notsupported">
+                {% endif %}                      
+              {% endif %}
+
+                <tbody>
+                  
+                  <tr>
+                    <th width="100%" colspan="2" class="text-center">&nbsp;</th>
+                  </tr>
+                  <tr>
+                    <th width="20%">Port</th>
+                    <td>{{ result['targetspec']['port'] }}</td>
+                  </tr>
+                  {% if result['error'] %}
+                  <tr>
+                    <th width="20%">Error</th>
+                    <td class="text-danger">{{ result['error'] }}</td>
+                  </tr>
+                  {% else %}
+                  <tr>
+                    <th width="20%">PQC Supported</th>
+
+                    {% if result['pqc_supported'] %}
+                      <td class="text-success">{{ result['pqc_supported']}}</td>
+                      <tr>
+                        <th width="20%">PQC Algorithms</th>
+                        <td>
+                          {% for algo in result['pqc_algos'] | sort %}
+                            {{ algo }}{% if not loop.last %}, {% endif %}
+                          {% endfor %}
+                        </td>
+                      </tr>
+                    {% else %}
+                      <td class="text-warning">{{ result['pqc_supported']}}</td>
+                    {% endif %}
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
