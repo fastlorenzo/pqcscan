@@ -1,0 +1,2 @@
+- hide the full host/nodes when they have no valid entries due to filtering
+- hide the SSH/TLS results tab if there are no results from there present
