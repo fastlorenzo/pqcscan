@@ -7,8 +7,13 @@
         hideErrorScansElement.addEventListener('change', function () {
             if (this.checked) {
                 $('.pqcscan-error').show();
+                $('.host_has_error').show();
             } else {
                 $('.pqcscan-error').hide();
+                $('.host_has_error').hide();
+                if (document.getElementById('showOkScans_{{type}}').checked) {
+                  $('.host_has_ok').show();
+                }
             }
         });
         const hideOkScansElement = document.getElementById('showOkScans_{{type}}');
@@ -18,13 +23,19 @@
                 $('.pqcscan-ok').show();
                 $('.pqc-notsupported').show();
                 $('.pqc-supported').show();
+                $('.host_has_ok').show();
                 if (!document.getElementById('showErrorScans_{{type}}').checked) {
                   $('.pqcscan-error').hide();
                 }
-            } else {
+            }
+            else {
               document.getElementById('pqcSupportedOnly_{{type}}').checked = false;
               document.getElementById('nonpqcSupportedOnly_{{type}}').checked = false;
               $('.pqcscan-ok').hide();
+              $('.host_has_ok').hide();
+              if (document.getElementById('showErrorScans_{{type}}').checked) {
+                  $('.host_has_error').show();
+              }
             }
         });
         const showPQCOnlyElement = document.getElementById('pqcSupportedOnly_{{type}}');
