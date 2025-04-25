@@ -11,67 +11,54 @@
             } else {
                 $('.pqcscan-error').hide();
                 $('.host_has_error').hide();
-                if (document.getElementById('showOkScans_{{type}}').checked) {
-                  $('.host_has_ok').show();
-                }
+              
             }
-        });
-        const hideOkScansElement = document.getElementById('showOkScans_{{type}}');
-        hideOkScansElement.checked = true;
-        hideOkScansElement.addEventListener('change', function () {
-            if (this.checked) {
-                $('.pqcscan-ok').show();
-                $('.pqc-notsupported').show();
-                $('.pqc-supported').show();
-                $('.host_has_ok').show();
-                if (!document.getElementById('showErrorScans_{{type}}').checked) {
-                  $('.pqcscan-error').hide();
-                }
+            if (document.getElementById('pqcSupportedOnly_{{type}}').checked) {
+                  $('.host_has_pqc').show();
+                  $('.pqc-supported').show();
             }
-            else {
-              document.getElementById('pqcSupportedOnly_{{type}}').checked = false;
-              document.getElementById('nonpqcSupportedOnly_{{type}}').checked = false;
-              $('.pqcscan-ok').hide();
-              $('.host_has_ok').hide();
-              if (document.getElementById('showErrorScans_{{type}}').checked) {
-                  $('.host_has_error').show();
-              }
-            }
+                if (document.getElementById('nonpqcSupportedOnly_{{type}}').checked) {
+                  $('.host_has_nonpqc').show();
+                  $('.pqc-notsupported').show();
+                }  
         });
         const showPQCOnlyElement = document.getElementById('pqcSupportedOnly_{{type}}');
-        showPQCOnlyElement.checked = false;
+        showPQCOnlyElement.checked = true;
         showPQCOnlyElement.addEventListener('change', function () {
             if (this.checked) {
-                $('.pqc-notsupported').hide();
                 $('.pqc-supported').show();
-                document.getElementById('showOkScans_{{type}}').checked = true;
-                document.getElementById('nonpqcSupportedOnly_{{type}}').checked = false;
+                $('.host_has_pqc').show();
             } else {
-                $('.pqc-notsupported').show();
-                $('.pqc-supported').show();
-                if (!document.getElementById('showErrorScans_{{type}}').checked) {
-                  $('.pqcscan-error').hide();
-                }
+                $('.pqc-supported').hide();
+                $('.host_has_pqc').hide();
             }
+            if (document.getElementById('showErrorScans_{{type}}').checked) {
+                  $('.host_has_error').show();
+                  $('.pqcscan-error').show();
+                }
+            if (document.getElementById('nonpqcSupportedOnly_{{type}}').checked) {
+                $('.host_has_nonpqc').show();
+                $('.pqc-notsupported').show();
+            }  
         });
         const nonpqcSupportedOnlyElement = document.getElementById('nonpqcSupportedOnly_{{type}}');
-        nonpqcSupportedOnlyElement.checked = false;
+        nonpqcSupportedOnlyElement.checked = true;
         nonpqcSupportedOnlyElement.addEventListener('change', function () {
             if (this.checked) {
-                $('.pqc-notsupported').show();
-                $('.pqc-supported').hide();
-                if (!document.getElementById('showErrorScans_{{type}}').checked) {
-                  $('.pqcscan-error').hide();
-                }
-                document.getElementById('showOkScans_{{type}}').checked = true;
-                document.getElementById('pqcSupportedOnly_{{type}}').checked = false;
+              $('.pqc-notsupported').show();
+              $('.host_has_nonpqc').show();
             } else {
-                $('.pqc-notsupported').show();
-                $('.pqc-supported').show();
-                if (!document.getElementById('showErrorScans_{{type}}').checked) {
-                  $('.pqcscan-error').hide();
-                }
+              $('.pqc-notsupported').hide();
+              $('.host_has_nonpqc').hide();
             }
+            if (document.getElementById('showErrorScans_{{type}}').checked) {
+                $('.host_has_error').show();
+                $('.pqcscan-error').show();
+              }
+              if (document.getElementById('pqcSupportedOnly_{{type}}').checked) {
+                $('.host_has_pqc').show();
+                $('.pqc-supported').show();
+              }  
         });
     });
     </script>
@@ -90,16 +77,12 @@
               <label class="form-check-label" for="showErrorScans_{{type}}">Show Erroneous Scans</label>
             </div>
             <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="showOkScans_{{type}}" checked>
-              <label class="form-check-label" for="showOkScans_{{type}}">Show Successful Scans</label>
-            </div>
-            <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" id="pqcSupportedOnly_{{type}}" checked>
-              <label class="form-check-label" for="pqcSupportedOnly_{{type}}">PQC Supported Only</label>
+              <label class="form-check-label" for="pqcSupportedOnly_{{type}}">Show PQC Supported</label>
             </div>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" id="nonpqcSupportedOnly_{{type}}" checked>
-              <label class="form-check-label" for="nonpqcSupportedOnly_{{type}}">Non-PQC Supported Only</label>
+              <label class="form-check-label" for="nonpqcSupportedOnly_{{type}}">Show Non-PQC Supported</label>
             </div>
           </div>
         </div>
