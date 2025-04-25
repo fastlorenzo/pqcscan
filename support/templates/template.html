@@ -1,3 +1,4 @@
+{% import "macros.html" as macros %}
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html" data-bs-theme="dark">
   <head>
@@ -58,6 +59,13 @@
             // Scroll to the top of the page
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
+
+        /* reset the filter settings when switching tabs */
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+          {{ macros::show_all_elements() }}
+          {{ macros::reset_filter_settings(type="ssh") }}
+          {{ macros::reset_filter_settings(type="tls") }}          
+        });
     });
     </script>
    
@@ -81,7 +89,7 @@
             <a class="nav-link" id="ssh-tab" data-toggle="tab" href="#ssh" role="tab" aria-controls="ssh" aria-selected="false">SSH Results</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="tls-tab" data-toggle="tab" href="#tls" role="tab" aria-controls="tls" aria-selected="false">TLS Results</a>
+            <a class="nav-link" id="tls-tab" shown="alert(123);" data-toggle="tab" href="#tls" role="tab" aria-controls="tls" aria-selected="false">TLS Results</a>
         </li>
       </ul>
     </nav>

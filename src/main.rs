@@ -219,7 +219,7 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
         scan_windows: scan_windows
     };
 
-    let templates = ["template.html", "macros.html", "ssh_results.html", "tls_results.html", "summary.html"];
+    let templates = ["macros.html", "template.html", "ssh_results.html", "tls_results.html", "summary.html"];
     let mut tera = Tera::default();
 
     for template in templates {

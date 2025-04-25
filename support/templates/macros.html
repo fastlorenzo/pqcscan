@@ -73,20 +73,35 @@
           </div>
           <div class="card-body">
             <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="showErrorScans_{{type}}" checked>
-              <label class="form-check-label" for="showErrorScans_{{type}}">Show Erroneous Scans</label>
-            </div>
-            <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" id="pqcSupportedOnly_{{type}}" checked>
-              <label class="form-check-label" for="pqcSupportedOnly_{{type}}">Show PQC Supported</label>
+              <label class="form-check-label" for="pqcSupportedOnly_{{type}}">Show PQC-enabled hosts</label>
             </div>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" id="nonpqcSupportedOnly_{{type}}" checked>
-              <label class="form-check-label" for="nonpqcSupportedOnly_{{type}}">Show Non-PQC Supported</label>
+              <label class="form-check-label" for="nonpqcSupportedOnly_{{type}}">Show Non-PQC-enabled hosts</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="showErrorScans_{{type}}" checked>
+              <label class="form-check-label" for="showErrorScans_{{type}}">Show Failed Scans</label>
             </div>
           </div>
         </div>
       </div>
     </div>
 </div>
+{% endmacro filter_settings %}
+
+{% macro reset_filter_settings(type) %}
+    document.getElementById('pqcSupportedOnly_{{type}}').checked = true;
+    document.getElementById('nonpqcSupportedOnly_{{type}}').checked = true;
+    document.getElementById('showErrorScans_{{type}}').checked = true;
+{% endmacro filter_settings %}
+
+{% macro show_all_elements() %}
+    $('.pqcscan-error').show();
+    $('.host_has_error').show();
+    $('.host_has_pqc').show();
+    $('.pqc-supported').show();
+    $('.host_has_nonpqc').show();
+    $('.pqc-notsupported').show();
 {% endmacro filter_settings %}
