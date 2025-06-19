@@ -259,7 +259,7 @@ fn main() -> Result<()> {
         .subcommand_required(true)
         .arg_required_else_help(true)
         .about("Post-Quantum Cryptography Scanner - Scan SSH/TLS servers for PQC support")
-        .after_help("pqcscan is maintained by Anvil Secure Inc. For more information see: https://anvilsecure.com")
+        .after_help("PQCscan is free BSD-licensed software by Anvil Secure Inc (https://anvilsecure.com).")
         .flatten_help(true)
 
         .subcommand(
