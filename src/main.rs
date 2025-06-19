@@ -4,6 +4,7 @@ use clap::{Arg, Command, ArgAction, ArgMatches, crate_version};
 use std::path::PathBuf;
 use std::io::{BufReader, BufRead, BufWriter};
 use std::fs::File;
+use std::convert::From;
 use std::collections::{BTreeSet, HashMap};
 use tokio::runtime::Runtime;
 use std::sync::Arc;
@@ -27,6 +28,8 @@ use crate::scan::{Scan, ScanType, ScanOptions, ScanResult, scan_runner};
 #[folder = "$CARGO_MANIFEST_DIR/support/templates/"]
 struct EmbeddedResources;
 
+const DEFAULT_NUM_THREADS: usize = 8;
+
 fn output_args(file_type: &str, req: bool) -> Vec<clap::Arg> {
     vec![
         Arg::new("output")
@@ -37,6 +40,14 @@ fn output_args(file_type: &str, req: bool) -> Vec<clap::Arg> {
             .required(req)
             .action(ArgAction::Set),
     ]
+}
+
+fn num_threads_arg() -> clap::Arg {
+    Arg::new("num-threads")
+        .long("num-threads")
+        .default_value(format!("{}", DEFAULT_NUM_THREADS))
+        .value_parser(clap::value_parser!(usize))
+        .help("Number of scan threads to use")
 }
 
 fn target_args() -> Vec<clap::Arg> {
@@ -257,6 +268,8 @@ fn main() -> Result<()> {
                 .args(target_args())
                 .next_help_heading("Output")
                 .args(output_args("JSON", false))
+                .next_help_heading("Scan Options")
+                .args(vec![num_threads_arg()])
                 .disable_help_flag(true)
                 .disable_version_flag(true)
         )
@@ -268,7 +281,7 @@ fn main() -> Result<()> {
                 .next_help_heading("Output")
                 .args(output_args("JSON", false))
                 .next_help_heading("Scan Options")
-                .args(vec![
+                .args(vec![num_threads_arg(),
                     Arg::new("only-hybrid-algos")
                         .long("only-hybrid-algos")
                         .required(false)
@@ -300,7 +313,7 @@ fn main() -> Result<()> {
     let config = Config::new();
 
     let mut scan = ScanOptions {
-        num_threads: 100,
+        num_threads: DEFAULT_NUM_THREADS,
         targets: vec![],
         scan_type: None,
         scan_hybrid_algos_only: false
@@ -313,11 +326,13 @@ fn main() -> Result<()> {
             scan.targets = get_targets(sub_matches, Some(config.tls_config.default_port))?;
             scan.scan_type = Some(ScanType::Tls);
             scan.scan_hybrid_algos_only = *sub_matches.get_one::<bool>("only-hybrid-algos").unwrap();
+            scan.num_threads = *sub_matches.get_one::<usize>("num-threads").unwrap();
             output_json_file = sub_matches.get_one::<String>("output");
         },
         Some(("ssh-scan", sub_matches)) => {
             scan.targets = get_targets(sub_matches, Some(config.ssh_config.default_port))?;
             scan.scan_type = Some(ScanType::Ssh);
+            scan.num_threads = *sub_matches.get_one::<usize>("num-threads").unwrap();
             output_json_file = sub_matches.get_one::<String>("output");
         },
         Some(("create-report", sub_matches)) => {
