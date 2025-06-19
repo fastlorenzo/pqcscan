@@ -1,1 +1,5 @@
-- move TLS algo's etc to a JSON file t oo like we do for SSH
+- move TLS algo's etc to a JSON file like we do for SSH
+
+- rewrite the templates to not be so ridicuously large for 10s of 1000s of results
+  possibly do this by simply generating a JSON list of all the results and rewrite
+  the templates that all the elements are built up via pure JS instead of generated HTML
