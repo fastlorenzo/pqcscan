@@ -33,7 +33,7 @@ pub fn parse_single_target(input: &String, default_port: Option<u16>) -> Result<
         Some(pos) => {
             let port = input[pos+1..input.len()].parse::<u16>();
             match port {
-                Err(e) => {
+                Err(_) => {
                     Err(anyhow!("Invalid port. Value not in range [0-65535]."))
                 }
                 Ok(port) => {
@@ -77,7 +77,7 @@ pub async fn socket_create_and_connect(target: &Target, timeout: u64) -> Result<
         Ok(Ok(e)) => {
             Ok((addr, e))
         },
-        Ok(Err(e)) => {
+        Ok(Err(_)) => {
             Err(anyhow!("Could not connect to {addr}"))
         }
         Err(_) => {

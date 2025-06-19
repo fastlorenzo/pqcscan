@@ -1,3 +1,4 @@
+#![allow(non_snake_case, unused)]
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 

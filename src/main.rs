@@ -123,9 +123,6 @@ struct ScanWindow {
 }
 
 fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
-    let mut start_time: DateTime<Utc>;
-    
-    let mut end_time: DateTime<Utc>;
     let mut tls_map: HashMap<String, Vec<ScanResult>> = HashMap::new();
     let mut ssh_map: HashMap<String, Vec<ScanResult>> = HashMap::new();
     let mut tls_hosts: BTreeSet<String> = BTreeSet::new();
@@ -141,7 +138,7 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
     for input_file in input_files {
         log::debug!("Opening and parsing {}", input_file);
 
-        let mut file = File::open(input_file)?;
+        let file = File::open(input_file)?;
         let scan: Scan = serde_json::from_reader(file).expect("failed to open input file");
 
         if scan.version != crate_version!() {
@@ -159,7 +156,7 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
 
         for result in scan.results {
             match result {
-                ScanResult::Ssh {ref targetspec, ref addr, ref error, pqc_supported, ref pqc_algos, ref nonpqc_algos} => {
+                ScanResult::Ssh {ref targetspec, ref error, pqc_supported, ..} => {
                     ssh_hosts.insert(targetspec.host.clone());
                     let host = targetspec.host.clone();
                     if ssh_map.get(&host).is_none() {
@@ -175,7 +172,7 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
                     ssh_total_count += 1;
                     m.push(result);                    
                 },
-                ScanResult::Tls {ref targetspec, ref addr, ref error, pqc_supported, ref pqc_algos, ref hybrid_algos} => {
+                ScanResult::Tls {ref targetspec, ref error, pqc_supported, ..} => {
                     tls_hosts.insert(targetspec.host.clone());
                     let host = targetspec.host.clone();
                     if tls_map.get(&host).is_none() {
@@ -203,7 +200,7 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
     let tls_fail_count = tls_total_count - tls_success_count;
     let ssh_fail_count = ssh_total_count - ssh_success_count;
 
-    let mut results: ReportResults = ReportResults {
+    let results: ReportResults = ReportResults {
         tls_results: tls_map,
         tls_sorted_hosts: tls_hosts,
         tls_success_count: tls_success_count,
@@ -235,7 +232,7 @@ fn create_report(output_file: &str, input_files: &Vec<&String>) -> Result<()> {
 
     log::trace!("Tera Template: {:?}", ctx);
 
-    let mut f = File::create(output_file)?;
+    let f = File::create(output_file)?;
     tera.render_to("template.html", &ctx, f)?;
 
     Ok(())
@@ -295,7 +292,7 @@ fn main() -> Result<()> {
     let config = Config::new();
 
     let mut scan = ScanOptions {
-        num_threads: 20,
+        num_threads: 100,
         targets: vec![],
         scan_type: None
     };
@@ -314,7 +311,8 @@ fn main() -> Result<()> {
             output_json_file = sub_matches.get_one::<String>("output");
         },
         Some(("create-report", sub_matches)) => {
-            let input_files: Vec<_> = sub_matches.get_many::<String>("input").unwrap().collect();
+            let input_files: Vec<_> = sub_matches.get_many::<String>("input").
+                ok_or(anyhow!("Need at least one input JSON file to convert into a report"))?.collect();
             create_report(sub_matches.get_one::<String>("output").unwrap(), &input_files)?;
         }
         _ => unreachable!("somehow reached this")
@@ -327,7 +325,7 @@ fn main() -> Result<()> {
 
         /* write results to JSON output if requested */
         if output_json_file.is_some() {
-            let mut f = File::create(output_json_file.unwrap())?;
+            let f = File::create(output_json_file.unwrap())?;
             let mut writer = BufWriter::new(f);
             serde_json::to_writer(&mut writer, &results)?;
         }

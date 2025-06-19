@@ -6,14 +6,13 @@ use crate::scan::ScanResult;
 
 use anyhow::{anyhow, Result};
 use std::io::{Cursor, Read, Write};
-use std::net::{TcpStream, ToSocketAddrs};
-use rand::{Rng, rng, thread_rng};
-use byteorder::{ByteOrder, NetworkEndian, WriteBytesExt, ReadBytesExt};
-use clap::{command, arg};
-use std::net::SocketAddr;
+use std::net::{TcpStream};
+use rand::{Rng, rng};
+use byteorder::{NetworkEndian, WriteBytesExt, ReadBytesExt};
 
-use crate::tlsconstants::{CipherSuite, SigScheme, Group, KeyShareLengths, GroupDescription, TlsAlerts};
+use crate::tlsconstants::{CipherSuite, SigScheme, Group, GroupDescription, TlsAlerts};
 use crate::utils::socket_create_and_connect;
+
 struct Extension {
     pub ext_type: u16,
     pub ext_len: u16,
@@ -39,6 +38,7 @@ impl TlsConfig {
 }
 
 impl KeyShareEntry {
+    #![allow(dead_code)]
     pub fn new(group: u16, exchange: Vec<u8>) -> KeyShareEntry {
         KeyShareEntry {
             group: group,
@@ -70,7 +70,7 @@ impl Extension {
     fn supported_versions() -> Result<Extension> {
         let mut buf: Vec<u8> = vec![];
         buf.write_u8(2)?;
-        buf.write_u16::<NetworkEndian>(0x0304);  /* TLS 1.3 */
+        buf.write_u16::<NetworkEndian>(0x0304)?;  /* TLS 1.3 */
         Ok(Extension{
             ext_type: 43,
             ext_len: 3,
@@ -81,7 +81,7 @@ impl Extension {
 
     fn record_size_limit(limit: u16) -> Result<Extension> {
         let mut buf: Vec<u8> = vec![];
-        buf.write_u16::<NetworkEndian>(limit);
+        buf.write_u16::<NetworkEndian>(limit)?;
         Ok(Extension{
             ext_type: 28,
             ext_len: 2,
@@ -93,9 +93,9 @@ impl Extension {
     fn supported_groups(groups: Vec<u16>) -> Result<Extension> {
         let mut buf: Vec<u8> = vec![];
         let g_len: u16 = (groups.len() * 2).try_into()?;
-        buf.write_u16::<NetworkEndian>(g_len);
+        buf.write_u16::<NetworkEndian>(g_len)?;
         for group in groups {
-            buf.write_u16::<NetworkEndian>(group);
+            buf.write_u16::<NetworkEndian>(group)?;
         }
         Ok(Extension {
             ext_type: 10,
@@ -107,9 +107,9 @@ impl Extension {
     fn signature_algorithms(algos: Vec<u16>) -> Result<Extension> {
         let mut buf: Vec<u8> = vec![];
         let ha_len: u16 = (algos.len() * 2).try_into()?;
-        buf.write_u16::<NetworkEndian>(ha_len);
+        buf.write_u16::<NetworkEndian>(ha_len)?;
         for algo in algos {
-            buf.write_u16::<NetworkEndian>(algo);
+            buf.write_u16::<NetworkEndian>(algo)?;
         }
         Ok(Extension {
             ext_type: 13,
@@ -137,10 +137,10 @@ impl Extension {
 
     fn compress_certificate() -> Result<Extension> {
         let mut buf: Vec<u8> = vec![];
-        buf.write_u8(6);
-        buf.write_u16::<NetworkEndian>(0x1); /* zlib */
-        buf.write_u16::<NetworkEndian>(0x2); /* brotli */
-        buf.write_u16::<NetworkEndian>(0x3); /* zstd */
+        buf.write_u8(6)?;
+        buf.write_u16::<NetworkEndian>(0x1)?; /* zlib */
+        buf.write_u16::<NetworkEndian>(0x2)?; /* brotli */
+        buf.write_u16::<NetworkEndian>(0x3)?; /* zstd */
 
         Ok(Extension {
             ext_type: 27,
@@ -151,7 +151,7 @@ impl Extension {
 
     fn renegotiation_info() -> Result<Extension> {
         let mut buf: Vec<u8> = vec![];
-        buf.write_u8(0);
+        buf.write_u8(0)?;
 
         Ok(Extension {
             ext_type: 65281,
@@ -162,8 +162,8 @@ impl Extension {
 
     fn ec_point_formats() -> Result<Extension> {
         let mut buf: Vec<u8> = vec![];
-        buf.write_u8(1);
-        buf.write_u8(0);
+        buf.write_u8(1)?;
+        buf.write_u8(0)?;
 
         Ok(Extension {
             ext_type: 11,
@@ -222,16 +222,16 @@ pub struct ClientHelloBuilder {
 impl ClientHelloBuilder {
     fn new() -> ClientHelloBuilder {
         let mut random: [u8; 32] = [0; 32];
-        thread_rng().fill(&mut random[..]);
+        rng().fill(&mut random[..]);
 
 		/*
 		  generate 32 byets of random session id data. In TLS 1.3 session
 		  resume works via PSK (pre-shared keys), but this keeps some annoying middleware
 		  kboxes of our back as it will "disguise" 1.3 sessions as resumed 1.2 sessions. 
 	    */
-        const session_id_len: usize = 32;
-        let mut session_id: [u8; session_id_len] = [0; session_id_len];
-        thread_rng().fill(&mut session_id);
+        const SESSION_ID_LEN: usize = 32;
+        let mut session_id: [u8; SESSION_ID_LEN] = [0; SESSION_ID_LEN];
+        rng().fill(&mut session_id);
 
         ClientHelloBuilder {
             legacy_version: 0x0303,
@@ -249,7 +249,7 @@ impl ClientHelloBuilder {
 
         buf.write_u16::<NetworkEndian>(self.legacy_version)?;
         buf.write(&self.random)?;
-        buf.write_u8(self.session_id.len().try_into()?);
+        buf.write_u8(self.session_id.len().try_into()?)?;
         buf.write(&self.session_id)?;
 
         let cslen: u16 = (self.cipher_suites.len() * 2).try_into()?;
@@ -258,7 +258,7 @@ impl ClientHelloBuilder {
             buf.write_u16::<NetworkEndian>(*cs)?;
         }
 
-        buf.write_u8(self.compression_methods.len().try_into()?);
+        buf.write_u8(self.compression_methods.len().try_into()?)?;
         for cm in &self.compression_methods {
             buf.write_u8(*cm)?;
         }
@@ -332,7 +332,7 @@ fn tls_connect_with_group(stream: &mut TcpStream, host: &str, group: u16) -> Res
         SigScheme::ECDSA_SHA1
     ];
 
-    let mut keyshares: Vec<KeyShareEntry> = vec![];
+    let keyshares: Vec<KeyShareEntry> = vec![];
 
     let mut chb = ClientHelloBuilder::new();
     for cipher in ciphers {
@@ -352,7 +352,7 @@ fn tls_connect_with_group(stream: &mut TcpStream, host: &str, group: u16) -> Res
     chb.add_extension(Extension::renegotiation_info()?);
     chb.add_extension(Extension::ec_point_formats()?);
 
-    stream.write(&chb.into_buf()?);
+    stream.write(&chb.into_buf()?)?;
     let mut buf: [u8; 5000] = [0; 5000];
 
     let read = stream.read(&mut buf)?;
@@ -417,7 +417,7 @@ pub async fn tls_scan_target(config: &Arc<Config>, target: &Target) -> ScanResul
     log::debug!("Started TLS scanning {}", target);
 
     let mut pqc_supported = false;
-    let mut pqc_algos: Vec<String> = vec![];
+    let pqc_algos: Vec<String> = vec![];
     let mut hybrid_algos: Vec<String> = vec![];
 
     let groups = vec![
