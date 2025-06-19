@@ -47,6 +47,7 @@ pub struct ScanOptions {
     pub num_threads: usize,
     pub targets: Vec<Target>,
     pub scan_type: Option<ScanType>,
+    pub scan_hybrid_algos_only: bool,
 }
 
 pub async fn scan_runner(config: Arc<Config>, scan: ScanOptions) -> Scan {
@@ -99,7 +100,7 @@ pub async fn scan_runner(config: Arc<Config>, scan: ScanOptions) -> Scan {
                     let scan_type = scan.scan_type.clone().unwrap();
                     let result = match scan_type {
                         ScanType::Tls => {
-                            tls_scan_target(&config, &target).await
+                            tls_scan_target(&config, &target, scan.scan_hybrid_algos_only).await
                         },
                         ScanType::Ssh => {
                             ssh_scan_target(&config, &target).await

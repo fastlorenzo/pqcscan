@@ -413,23 +413,24 @@ fn tls_connect_with_group(stream: &mut TcpStream, host: &str, group: u16) -> Res
 }
 
 
-pub async fn tls_scan_target(config: &Arc<Config>, target: &Target) -> ScanResult {
+pub async fn tls_scan_target(config: &Arc<Config>, target: &Target, hybrid_algos_only: bool) -> ScanResult {
     log::debug!("Started TLS scanning {}", target);
 
     let mut pqc_supported = false;
     let pqc_algos: Vec<String> = vec![];
     let mut hybrid_algos: Vec<String> = vec![];
 
-    let groups = vec![
+    let mut groups = vec![
         Group::X25519MLKEM768,
-        /*
         Group::SECP256R1MLKEM768,
-        Group::SECP384R1MLKEM1024,
-        Group::MLKEM1024,
-        Group::MLKEM512,
-        Group::MLKEM768,
-        */
+        Group::SECP384R1MLKEM1024
     ];
+
+    if !hybrid_algos_only {
+        groups.push(Group::MLKEM1024);
+        groups.push(Group::MLKEM512);
+        groups.push(Group::MLKEM768);
+    }
 
     let mut addr: Option<String> = None;
 

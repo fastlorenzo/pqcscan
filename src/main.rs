@@ -267,6 +267,14 @@ fn main() -> Result<()> {
                 .args(target_args())
                 .next_help_heading("Output")
                 .args(output_args("JSON", false))
+                .next_help_heading("Scan Options")
+                .args(vec![
+                    Arg::new("only-hybrid-algos")
+                        .long("only-hybrid-algos")
+                        .required(false)
+                        .action(ArgAction::SetTrue)
+                        .help("Limit scan to PQC hybrid algorithms only")
+                ])
                 .disable_help_flag(true)
                 .disable_version_flag(true)
         )
@@ -294,7 +302,8 @@ fn main() -> Result<()> {
     let mut scan = ScanOptions {
         num_threads: 100,
         targets: vec![],
-        scan_type: None
+        scan_type: None,
+        scan_hybrid_algos_only: false
     };
 
     let mut output_json_file: Option<&String> = None;
@@ -303,6 +312,7 @@ fn main() -> Result<()> {
         Some(("tls-scan", sub_matches)) => {
             scan.targets = get_targets(sub_matches, Some(config.tls_config.default_port))?;
             scan.scan_type = Some(ScanType::Tls);
+            scan.scan_hybrid_algos_only = *sub_matches.get_one::<bool>("only-hybrid-algos").unwrap();
             output_json_file = sub_matches.get_one::<String>("output");
         },
         Some(("ssh-scan", sub_matches)) => {
