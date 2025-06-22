@@ -7,6 +7,7 @@ use crate::scan::ScanResult;
 use anyhow::{anyhow, Result};
 use std::io::{Cursor, Read, Write};
 use std::net::{TcpStream};
+use std::time::Duration;
 use rand::{Rng, rng};
 use byteorder::{NetworkEndian, WriteBytesExt, ReadBytesExt};
 
@@ -452,6 +453,13 @@ pub async fn tls_scan_target(config: &Arc<Config>, target: &Target, hybrid_algos
         addr = Some(_addr.to_string());
         let mut stream = stream.into_std().unwrap();
         stream.set_nonblocking(false).unwrap();
+        let res = stream.set_read_timeout(Some(Duration::from_secs(config.read_timeout)));
+        if res.is_err() {
+            log::warn!("Error while setting read timeout for socket to {0}s", config.read_timeout);
+        }
+        else {
+            log::trace!("Set read timeout for socket to {0}s", config.read_timeout);
+        }
 
         let ret = tls_connect_with_group(&mut stream, &target.host, group);
         match ret {
