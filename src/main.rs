@@ -347,7 +347,9 @@ fn main() -> Result<()> {
     /* perform scan if requested */
     if scan.scan_type.is_some() {
         let rt = Runtime::new()?;
+
         let results = rt.block_on(scan_runner(Arc::new(config), scan));
+        rt.shutdown_background();
 
         /* write results to JSON output if requested */
         if output_json_file.is_some() {
@@ -355,6 +357,7 @@ fn main() -> Result<()> {
             let mut writer = BufWriter::new(f);
             serde_json::to_writer(&mut writer, &results)?;
         }
+
     }
 
     Ok(())
