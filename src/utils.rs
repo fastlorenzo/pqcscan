@@ -56,6 +56,10 @@ pub async fn socket_create_and_connect(target: &Target, timeout: u64) -> Result<
         return Err(anyhow!("Could not resolve {}", target.host));
     }
     let addrs_resolved = addrs_resolved.unwrap();
+    if addrs_resolved.is_err() {
+        log::trace!("Could not resolve {target}: {:?}", addrs_resolved.err());
+        return Err(anyhow!("Could not resolve {}", target.host));
+    }
 
     let addr = addrs_resolved.unwrap().next();
     if addr.is_none() {
