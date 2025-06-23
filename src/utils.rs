@@ -1,9 +1,9 @@
 use anyhow::{anyhow, Result};
 use std::fmt;
 use serde::{Serialize, Deserialize};
-use tokio::net::{TcpSocket, TcpStream};
+use tokio::net::{TcpSocket, TcpStream, lookup_host};
 use tokio::time::Duration;
-use std::net::{SocketAddr, ToSocketAddrs};
+use std::net::SocketAddr;
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Target {
@@ -49,11 +49,13 @@ pub fn parse_single_target(input: &String, default_port: Option<u16>) -> Result<
 
 pub async fn socket_create_and_connect(target: &Target, timeout: u64) -> Result<(SocketAddr, TcpStream)> {
 
-    let addrs_resolved = format!("{0}:{1}", target.host, target.port).to_socket_addrs();
+    let duration = Duration::from_millis(5000);
+    let addrs_resolved = tokio::time::timeout(duration, lookup_host(format!("{}", target))).await;
     if addrs_resolved.is_err() {
-        log::trace!("Could not resolve {target}: {:?}", addrs_resolved.err());
+        log::warn!("Could not resolve {target} within reasonable time. Timed out.");
         return Err(anyhow!("Could not resolve {}", target.host));
     }
+    let addrs_resolved = addrs_resolved.unwrap();
 
     let addr = addrs_resolved.unwrap().next();
     if addr.is_none() {
