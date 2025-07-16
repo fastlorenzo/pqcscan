@@ -26,7 +26,7 @@ There are binary releases for Linux, MacOS and Windows on common architectures o
 The implementation is straight forward Rust. You can download a tagged version's source distribution from the [releases](https://github.com/anvilsecure/pqcscan/releases) page. Or simply clone the git repository and then run:
 
 ```
-git clone git@github.com:anvilsecure/pqcscan.git
+git clone https://github.com/anvilsecure/pqcscan.git
 cd pqcscan
 cargo build --release
 ./target/release/pqcscan --help
