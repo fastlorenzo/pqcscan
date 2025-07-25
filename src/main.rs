@@ -88,9 +88,7 @@ fn get_targets(matches: &ArgMatches, default_port: Option<u16>) -> Result<Vec<Ta
             for line in reader.lines() {
                 let line = line?;
 
-                /* ignore comment lines starting with # */
-                let first = line.chars().next().unwrap();
-                if first == '#' {
+                if line.is_empty() || line.starts_with('#') {
                     continue;
                 }
 
