@@ -99,7 +99,7 @@ fn get_targets(matches: &ArgMatches, default_port: Option<u16>) -> Result<Vec<Ta
                         targets.push(t)
                     },
                     Err(e) => {
-                        return Err(anyhow!("Parsing HOST:PORT at line {line_no} failed. {e}"));
+                        return Err(anyhow!("Parsing line {line_no} ({line}) failed. {e}"));
                     }
                 }
             }
