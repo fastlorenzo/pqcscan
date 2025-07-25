@@ -82,11 +82,13 @@ fn get_targets(matches: &ArgMatches, default_port: Option<u16>) -> Result<Vec<Ta
             }
             let file = File::open(f.unwrap())?;
             let reader = BufReader::new(file);
-            let mut line_no = 1;
+            let mut line_no = 0;
             let mut targets: Vec<Target> = Vec::new();
 
             for line in reader.lines() {
                 let line = line?;
+
+                line_no += 1;
 
                 if line.is_empty() || line.starts_with('#') {
                     continue;
@@ -100,7 +102,6 @@ fn get_targets(matches: &ArgMatches, default_port: Option<u16>) -> Result<Vec<Ta
                         return Err(anyhow!("Parsing HOST:PORT at line {line_no} failed. {e}"));
                     }
                 }
-                line_no += 1;
             }
             Ok(targets)
         }
