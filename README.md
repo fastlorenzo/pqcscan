@@ -42,7 +42,7 @@ pqcscan tls-scan -t pq.cloudflareresearch.com:443 -o cloudflare.json
 pqcscan create-report -i gmail.json cloudflare.json -o report.html
 ```
 
-You can also create a target list in a file and suppy it via `-T`. This works for both `tls-scan` and `ssh-scan`.
+You can also create a target list in a file and supply it via `-T`. This works for both `tls-scan` and `ssh-scan`.
 
 ```
 echo github.com > targets
