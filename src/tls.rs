@@ -26,6 +26,7 @@ struct KeyShareEntry {
     exchange: Vec<u8>
 }
 
+#[derive(Default)]
 pub struct TlsConfig {
     pub default_port: u16
 }
@@ -464,7 +465,7 @@ pub async fn tls_scan_target(config: &Arc<Config>, target: &Target, hybrid_algos
         let ret = tls_connect_with_group(&mut stream, &target.host, group);
         match ret {
             Ok(_) => {
-                let algo = GroupDescription[&group].clone();
+                let algo = GroupDescription[&group];
                 log::debug!("{} supports hybrid PQC algo {}", &target, algo);
                 pqc_supported = true;
                 hybrid_algos.push(algo.to_string());

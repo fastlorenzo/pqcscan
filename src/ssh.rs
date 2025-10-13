@@ -32,6 +32,7 @@ struct KexAlgo {
     href: Option<String>
 }
 
+#[derive(Default)]
 pub struct SshConfig {
     kex_algos: HashMap<String, KexAlgo>,
     pub default_port: u16

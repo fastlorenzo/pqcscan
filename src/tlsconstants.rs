@@ -129,58 +129,58 @@ lazy_static! {
 }
 
 lazy_static! {
-    pub static ref GroupDescription: HashMap<u16, String> = {
+    pub static ref GroupDescription: HashMap<u16, &'static str> = {
         let mut m = HashMap::new();
-        m.insert(Group::X25519MLKEM768, "X25519MLKEM768".to_string()); // [draft-kwiatkowski-tls-ecdhe-mlkem-03 3.1.1]
-        m.insert(Group::X25519, "32".to_string()); // [RFC8446 4.2.8.2]
-        m.insert(Group::SECP256R1, "65".to_string()); // [RFC8446 4.2.8.2]
-        m.insert(Group::SECP256R1MLKEM768, "SECP256R1MLKEM768".to_string()); // [draft-kwiatkowski-tls-ecdhe-mlkem-03 3.1.1]
-        m.insert(Group::SECP384R1MLKEM1024, "SECP384R1MLKEM1024".to_string()); // [draft-kwiatkowski-tls-ecdhe-mlkem-03 3.1.1]
-        m.insert(Group::MLKEM1024, "MLKEM1024".to_string());
-        m.insert(Group::MLKEM512, "MLKEM512".to_string());
-        m.insert(Group::MLKEM768, "MLKEM768".to_string());
+        m.insert(Group::X25519MLKEM768, "X25519MLKEM768"); // [draft-kwiatkowski-tls-ecdhe-mlkem-03 3.1.1]
+        m.insert(Group::X25519, "X25519"); // [RFC8446 4.2.8.2]
+        m.insert(Group::SECP256R1, "SECP256R1"); // [RFC8446 4.2.8.2]
+        m.insert(Group::SECP256R1MLKEM768, "SECP256R1MLKEM768"); // [draft-kwiatkowski-tls-ecdhe-mlkem-03 3.1.1]
+        m.insert(Group::SECP384R1MLKEM1024, "SECP384R1MLKEM1024"); // [draft-kwiatkowski-tls-ecdhe-mlkem-03 3.1.1]
+        m.insert(Group::MLKEM1024, "MLKEM1024");
+        m.insert(Group::MLKEM512, "MLKEM512");
+        m.insert(Group::MLKEM768, "MLKEM768");
         m
     };
 }
 
 lazy_static! {
-    pub static ref TlsAlerts: HashMap<u8, String> = {
+    pub static ref TlsAlerts: HashMap<u8, &'static str> = {
         let mut m = HashMap::new();
-        m.insert(0, "close_notify".to_string()); // [RFC8446][RFC
-        m.insert(10, "unexpected_message".to_string()); // [RFC8446]
-        m.insert(20, "bad_record_mac".to_string()); // [RFC8446]
-        m.insert(21, "decryption_failed_RESERVED".to_string()); // [RFC8446]
-        m.insert(22, "record_overflow".to_string()); // [RFC8446]
-        m.insert(30, "decompression_failure_RESERVED".to_string()); // [RFC8446]
-        m.insert(40, "handshake_failure".to_string()); // [RFC8446]
-        m.insert(41, "no_certificate_RESERVED".to_string()); // [RFC8446]
-        m.insert(42, "bad_certificate".to_string()); // [RFC8446]
-        m.insert(43, "unsupported_certificate".to_string()); // [RFC8446]
-        m.insert(44, "certificate_revoked".to_string()); // [RFC8446]
-        m.insert(45, "certificate_expired".to_string()); // [RFC8446]
-        m.insert(46, "certificate_unknown".to_string()); // [RFC8446]
-        m.insert(47, "illegal_parameter".to_string()); // [RFC8446]
-        m.insert(48, "unknown_ca".to_string()); // [RFC8446]
-        m.insert(49, "access_denied".to_string()); // [RFC8446]
-        m.insert(50, "decode_error".to_string()); // [RFC8446]
-        m.insert(51, "decrypt_error".to_string()); // [RFC8446]
-        m.insert(52, "too_many_cids_requested".to_string()); // [RFC9147]
-        m.insert(60, "export_restriction_RESERVED".to_string()); // [RFC8446]
-        m.insert(70, "protocol_version".to_string()); // [RFC8446]
-        m.insert(71, "insufficient_security".to_string()); // [RFC8446]
-        m.insert(80, "internal_error".to_string()); // [RFC8446]
-        m.insert(86, "inappropriate_fallback".to_string()); // [RFC7507]
-        m.insert(90, "user_canceled".to_string()); // [RFC8446]
-        m.insert(100, "no_renegotiation_RESERVED".to_string()); // [RFC8446]
-        m.insert(109, "missing_extension".to_string()); // [RFC8446]
-        m.insert(110, "unsupported_extension".to_string()); // [RFC8446]
-        m.insert(111, "certificate_unobtainable_RESERVED".to_string()); // [RFC6066][RFC8446]
-        m.insert(112, "unrecognized_name".to_string()); // [RFC6066]
-        m.insert(113, "bad_certificate_status_response".to_string()); // [RFC6066]
-        m.insert(114, "bad_certificate_hash_value_RESERVED".to_string()); // [RFC6066][RFC8446]
-        m.insert(115, "unknown_psk_identity".to_string()); // [RFC4279]
-        m.insert(116, "certificate_required".to_string()); // [RFC8446]
-        m.insert(120, "no_application_protocol".to_string()); // [RFC7301][RFC8447]
+        m.insert(0, "close_notify"); // [RFC8446][RFC
+        m.insert(10, "unexpected_message"); // [RFC8446]
+        m.insert(20, "bad_record_mac"); // [RFC8446]
+        m.insert(21, "decryption_failed_RESERVED"); // [RFC8446]
+        m.insert(22, "record_overflow"); // [RFC8446]
+        m.insert(30, "decompression_failure_RESERVED"); // [RFC8446]
+        m.insert(40, "handshake_failure"); // [RFC8446]
+        m.insert(41, "no_certificate_RESERVED"); // [RFC8446]
+        m.insert(42, "bad_certificate"); // [RFC8446]
+        m.insert(43, "unsupported_certificate"); // [RFC8446]
+        m.insert(44, "certificate_revoked"); // [RFC8446]
+        m.insert(45, "certificate_expired"); // [RFC8446]
+        m.insert(46, "certificate_unknown"); // [RFC8446]
+        m.insert(47, "illegal_parameter"); // [RFC8446]
+        m.insert(48, "unknown_ca"); // [RFC8446]
+        m.insert(49, "access_denied"); // [RFC8446]
+        m.insert(50, "decode_error"); // [RFC8446]
+        m.insert(51, "decrypt_error"); // [RFC8446]
+        m.insert(52, "too_many_cids_requested"); // [RFC9147]
+        m.insert(60, "export_restriction_RESERVED"); // [RFC8446]
+        m.insert(70, "protocol_version"); // [RFC8446]
+        m.insert(71, "insufficient_security"); // [RFC8446]
+        m.insert(80, "internal_error"); // [RFC8446]
+        m.insert(86, "inappropriate_fallback"); // [RFC7507]
+        m.insert(90, "user_canceled"); // [RFC8446]
+        m.insert(100, "no_renegotiation_RESERVED"); // [RFC8446]
+        m.insert(109, "missing_extension"); // [RFC8446]
+        m.insert(110, "unsupported_extension"); // [RFC8446]
+        m.insert(111, "certificate_unobtainable_RESERVED"); // [RFC6066][RFC8446]
+        m.insert(112, "unrecognized_name"); // [RFC6066]
+        m.insert(113, "bad_certificate_status_response"); // [RFC6066]
+        m.insert(114, "bad_certificate_hash_value_RESERVED"); // [RFC6066][RFC8446]
+        m.insert(115, "unknown_psk_identity"); // [RFC4279]
+        m.insert(116, "certificate_required"); // [RFC8446]
+        m.insert(120, "no_application_protocol"); // [RFC7301][RFC8447]
         m
 	};
 }

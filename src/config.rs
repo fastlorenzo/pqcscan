@@ -1,6 +1,7 @@
 use crate::ssh::SshConfig;
 use crate::tls::TlsConfig;
 
+#[derive(Default)]
 pub struct Config {
     pub ssh_config: SshConfig,
     pub tls_config: TlsConfig,
