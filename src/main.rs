@@ -354,7 +354,7 @@ fn main() -> Result<()> {
         if output_json_file.is_some() {
             let f = File::create(output_json_file.unwrap())?;
             let mut writer = BufWriter::new(f);
-            serde_json::to_writer(&mut writer, &results)?;
+            serde_json::to_writer_pretty(&mut writer, &results)?;
         }
 
     }
